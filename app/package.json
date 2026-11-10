@@ -1,7 +1,7 @@
 {
   "name": "neos75-screen-app",
   "productName": "Neos75 屏幕",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "AULA Neos75 键盘屏幕桌面端（个人使用）",
   "author": "Neos75 Screen",
