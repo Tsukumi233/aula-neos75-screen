@@ -1,0 +1,70 @@
+<!doctype html>
+<!-- Néos Hi-Fi player (canvas layout, like stock page 5): the deck readout of our classic hifi_player (Webamp
+     with a Hitachi stereo skin: title display, spectrum analyser, transport) redrawn in the Néos language. The
+     24-band segmented analyser shows the real spectrum of what the default playback device plays (WASAPI
+     loopback FFT, 60 Hz - 16 kHz, `DATA.spec` 0..1 per band). -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="neos.css">
+<style>
+.title { position: absolute; left: 124px; width: 336px; top: 66px; font-size: 26px; font-weight: 500; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.artist { position: absolute; left: 124px; width: 336px; top: 102px; font-size: 15px; font-weight: 300; color: #a6a6a6;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* solid bars compress to ~2.8 KB per update (segmented ones ~7 KB): ~17 instead of ~7 frames/s */
+.spec { position: absolute; left: 124px; width: 336px; top: 130px; height: 84px; display: flex; gap: 4px;
+  border-bottom: 1px solid rgba(255,255,255,.18); }
+.spec .band { flex: 1; position: relative; }
+.spec .bar { position: absolute; left: 0; right: 0; bottom: 0; background: #ececec; }
+.spec .peak { position: absolute; left: 0; right: 0; height: 2px; background: #ff2a2a; }
+.scale { position: absolute; left: 124px; width: 336px; top: 218px; height: 12px; font-size: 9px; color: #7d7d7d; }
+.scale span { position: absolute; transform: translateX(-50%); }
+.tr { position: absolute; top: 290px; width: 34px; height: 34px; box-sizing: border-box; border-radius: 50%;
+  border: 1px solid #3a3a3d; background: #131419; display: flex; align-items: center; justify-content: center; }
+</style></head><body data-status="off" data-fps="20" data-quality="75" data-audio>
+<img class="strip" src="../official/jpg/page5_bg.jpg">
+<div class="pill" style="left:124px;top:24px" id="state"></div>
+<div class="abs lbl" style="right:20px;top:29px">Hi-Fi</div>
+<div class="title" id="title"></div>
+<div class="artist" id="artist"></div>
+<div class="spec" id="spec"></div>
+<div class="scale" id="scale"></div>
+<div class="track" style="left:124px;width:336px;top:244px"><i id="bar"></i><b id="dot"></b></div>
+<div class="abs dim" style="left:124px;top:254px;font-size:13px;font-weight:300" id="pos"></div>
+<div class="abs dim" style="right:20px;top:254px;font-size:13px;font-weight:300" id="dur"></div>
+<div class="tr" style="left:226px;top:293px"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 2v10M12 2 5 7l7 5z" fill="#ededed" stroke="#ededed" stroke-width="1.2"/></svg></div>
+<div class="tr" style="left:272px;width:40px;height:40px;border-color:#5a5a5e" id="play"></div>
+<div class="tr" style="left:324px;top:293px"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M11 2v10M2 2l7 5-7 5z" fill="#ededed" stroke="#ededed" stroke-width="1.2"/></svg></div>
+<script src="../widgets/data.js"></script>
+<script>
+const BANDS = 24, H = 84, F0 = 60, F1 = 16000;              // bands, bar area height, Hz range
+const bands = [], peaks = new Array(BANDS).fill(0);
+for (let b = 0; b < BANDS; b++) {
+  const band = document.createElement("div"); band.className = "band";
+  const bar = document.createElement("div"), peak = document.createElement("div");
+  bar.className = "bar"; peak.className = "peak"; band.append(bar, peak);
+  spec.appendChild(band); bands.push([bar, peak]);
+}
+for (const [f, label] of [[100, "100"], [300, "300"], [1000, "1k"], [3000, "3k"], [10000, "10k"]]) {
+  const s = document.createElement("span");   // band centres are log-spaced: place labels the same way
+  s.style.left = `${Math.log(f / F0) / Math.log(F1 / F0) * 100}%`; s.textContent = label; scale.appendChild(s);
+}
+const PLAY = '<svg width="14" height="16" viewBox="0 0 14 16"><path d="M3 1l11 7-11 7z" fill="#fff"/></svg>';
+const PAUSE = '<svg width="14" height="16" viewBox="0 0 14 16"><path d="M3 1h3v14H3zM9 1h3v14H9z" fill="#fff"/></svg>';
+window.render = () => {
+  state.textContent = !DATA.has_media ? "Idle" : DATA.playing ? "Now Playing" : "Paused";
+  title.textContent = DATA.has_media ? DATA.title : "Nothing playing";
+  artist.textContent = DATA.has_media ? [DATA.artist, DATA.album].filter(Boolean).join("  ·  ") : "";
+  const values = DATA.spec || [];
+  bands.forEach(([bar, peak], b) => {
+    const h = Math.round(Math.max(0, Math.min(1, values[b] || 0)) * (H - 4));
+    peaks[b] = Math.max(h, peaks[b] - 1.5);             // falling peak line, 1.5 px per frame
+    bar.style.height = `${h}px`;
+    peak.style.bottom = `${Math.round(peaks[b]) + 2}px`; peak.style.display = peaks[b] > 2 ? "" : "none";
+  });
+  const p = DATA.dur ? Math.min(1, DATA.pos / DATA.dur) : 0;
+  bar.style.width = `${p * 100}%`; dot.style.left = `${p * 100}%`; dot.style.display = DATA.dur ? "" : "none";
+  pos.textContent = mmss(DATA.pos); dur.textContent = DATA.dur ? mmss(DATA.dur) : "--:--";
+  play.innerHTML = DATA.playing ? PAUSE : PLAY;
+};
+render();
+</script>
+<script src="status.js"></script></body></html>

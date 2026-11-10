@@ -1,0 +1,43 @@
+/* Néos theme: live data drawn on the official Neos75 page backgrounds (design/official, from the official UI
+   pack via tools/ui_pack.py; personal use), in MiSans like the stock firmware's LVGL fonts. */
+@import url("https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSans-ExtraLight.min.css");
+@import url("https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSans-Light.min.css");
+@import url("https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSans-Regular.min.css");
+@import url("https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSans-Medium.min.css");
+/* Local copy (setup.ps1 copies app/node_modules/misans to design/vendor, not in git): declared last, so it
+   wins when present and the pages render the same offline; missing, the CDN rules above apply. */
+@import url("../vendor/misans/Normal/MiSans-ExtraLight.min.css");
+@import url("../vendor/misans/Normal/MiSans-Light.min.css");
+@import url("../vendor/misans/Normal/MiSans-Regular.min.css");
+@import url("../vendor/misans/Normal/MiSans-Medium.min.css");
+html, body { margin: 0; width: 480px; height: 360px; overflow: hidden; background: #000; }
+body { position: relative; font-family: MiSans, sans-serif; color: #f2f2f2; -webkit-font-smoothing: antialiased; }
+.bg { position: absolute; left: 0; top: 0; width: 480px; height: 360px; }
+.abs { position: absolute; }
+.lbl { font-size: 12px; color: #9a9a9a; letter-spacing: .02em; }
+/* the stock pill: dark fill, hairline light border, fully rounded (e.g. "Page 1", "Timer Mode") */
+.pill { position: absolute; height: 22px; padding: 0 12px; border-radius: 11px; border: 1px solid rgba(255,255,255,.42);
+  background: #161616; font-size: 13.5px; line-height: 22px; color: #ededed; box-sizing: border-box; white-space: nowrap; }
+/* polished-metal hairline used for bars and the progress line */
+.track { position: absolute; height: 2px; background: rgba(255,255,255,.14); border-radius: 1px; }
+.track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 1px;
+  background: linear-gradient(90deg, #6f7378 0%, #f4f6f8 45%, #9aa0a6 70%, #ffffff 100%); }
+.track b { position: absolute; top: -3px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #b9bec3 60%, #6d7176); }
+.big { font-weight: 200; letter-spacing: -.01em; font-variant-numeric: tabular-nums; line-height: 1; }
+.dim { color: #8c8c8c; }
+/* keyboard status on the baked status bar (status.js): stock colours 0x808080 / 0x80FF2B / 0xFF0000 */
+.kb-pct { position: absolute; width: 56px; height: 19px; font-size: 14px; line-height: 19px; text-align: center;
+  color: #fff; font-variant-numeric: tabular-nums; }
+.kb-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #808080; }
+.kb-dot.on { background: #ff0000; }
+.kb-dot.kb-charge.on { background: #80ff2b; }
+/* page number pill drawn over the baked one (status.js); measured: 79x25 at (21,20), fill #131419, hairline #363638 */
+.page-pill { position: absolute; height: 25px; min-width: 80px; padding: 0 14px; box-sizing: border-box; border-radius: 12.5px;
+  border: 1px solid #3a3a3d; background: #131419; color: #e8e8e8; font-size: 15px; line-height: 23px; text-align: center;
+  white-space: nowrap; }
+/* canvas layout (like stock page 5): the official left strip (page5_bg, 82x321: page pill, chrome ring,
+   NÉOS) with its pill on the same spot as every other page; the rest of the screen is the page's own. */
+.strip { position: absolute; left: 19px; top: 18px; width: 82px; height: 321px; }
+.chrome-text { background: linear-gradient(180deg, #ffffff 0%, #d9dde2 45%, #8d939a 70%, #f2f4f6 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }

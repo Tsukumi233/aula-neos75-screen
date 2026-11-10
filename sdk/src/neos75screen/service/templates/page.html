@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- A Néos page for the AULA Neos75 screen (480x360). Made by `neos75ctl new`; edit freely.
+     Layout like stock page 5: the official left strip (page pill, chrome ring, NÉOS) and your content on the
+     right (x 130..460). Live data: window.render() runs on every neos75Update (see ../widgets/data.js for
+     the fields: time/hms/weekday/day/month/year, cpu/gpu/mem/temp/disk/net, title/artist/pos/dur/playing,
+     kb_battery/kb_charging/kb_link, page_label, lvl_l/lvl_r, spec[24]).
+     Options: ?label=... (see neos75:options below; read them with new URLSearchParams(location.search)). -->
+<html><head><meta charset="utf-8">
+<meta name="neos75:title" content="{{TITLE}}">
+<meta name="neos75:description" content="{{DESCRIPTION}}">
+<meta name="neos75:options" content='[{"key": "label", "type": "text", "label": "标题", "default": "CPU"}]'>
+<link rel="stylesheet" href="../neos/neos.css">
+<style>
+.panel { position: absolute; left: 130px; top: 20px; width: 330px; height: 320px; }
+</style></head>
+<!-- data-status="off": no stock status bar on this layout; data-fps="1": one frame per second -->
+<body data-status="off" data-fps="1">
+<img class="strip" src="../official/jpg/page5_bg.jpg">
+<div class="panel">
+  <div class="pill" style="left:0;top:4px" id="label">CPU</div>
+  <div class="abs big" style="left:0;top:96px;font-size:96px" id="value">--</div>
+  <div class="abs lbl" style="left:4px;top:204px" id="sub"></div>
+  <div class="track" style="left:4px;top:250px;width:300px"><i id="bar"></i><b id="knob"></b></div>
+  <div class="abs dim" style="left:4px;top:282px;font-size:14px" id="clock"></div>
+</div>
+<script src="../widgets/data.js"></script>
+<script>
+const OPT = new URLSearchParams(location.search);
+document.getElementById("label").textContent = OPT.get("label") || "CPU";
+window.render = () => {
+  const v = Math.round(DATA.cpu);
+  value.innerHTML = `${v}<span class="dim" style="font-size:40px">%</span>`;
+  sub.textContent = `GPU ${Math.round(DATA.gpu)}%  ·  内存 ${Math.round(DATA.mem)}%`;
+  bar.style.width = `${v}%`; knob.style.left = `${v}%`;
+  clock.textContent = DATA.time;
+};
+render();
+</script>
+<!-- page number pill on the strip; must come after the page script -->
+<script src="../neos/status.js"></script></body></html>

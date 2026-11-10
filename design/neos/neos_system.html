@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Néos system monitor on the stock "Page 1" background (status bar, motto, NÉOS mark and the
+     AULA | NEO-RENAISSANCE plate are the official artwork); live load in the empty right-hand area. -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="neos.css">
+<style>
+.row { position: absolute; left: 180px; width: 276px; height: 60px; }
+.row .lbl { position: absolute; left: 0; top: 0; }
+.row .v { position: absolute; right: 0; top: -8px; font-size: 34px; }
+.row .v small { font-size: 15px; color: #8c8c8c; margin-left: 2px; }
+.row .track { left: 0; right: 0; top: 40px; }
+.foot { position: absolute; left: 180px; width: 276px; top: 258px; display: flex; justify-content: space-between; }
+.foot div { font-size: 15px; font-weight: 300; }
+.foot span { display: block; font-size: 11px; color: #8c8c8c; margin-bottom: 2px; }
+</style></head><body>
+<img class="bg" src="../official/jpg/page1_bg.jpg">
+<div class="row" style="top:86px"><span class="lbl">CPU</span><span class="v big" id="cpu"></span><div class="track"><i id="cpub"></i><b id="cpud"></b></div></div>
+<div class="row" style="top:142px"><span class="lbl">GPU</span><span class="v big" id="gpu"></span><div class="track"><i id="gpub"></i><b id="gpud"></b></div></div>
+<div class="row" style="top:198px"><span class="lbl">Memory</span><span class="v big" id="mem"></span><div class="track"><i id="memb"></i><b id="memd"></b></div></div>
+<div class="foot"><div><span>GPU temp</span><b id="tmp" style="font-weight:300"></b></div><div><span>Disk</span><b id="dsk" style="font-weight:300"></b></div><div><span>Download</span><b id="net" style="font-weight:300"></b></div></div>
+<script src="../widgets/data.js"></script>
+<script>
+window.render = () => {
+  for (const k of ["cpu", "gpu", "mem"]) {
+    const v = Math.max(0, Math.min(100, DATA[k]));
+    document.getElementById(k).innerHTML = `${v}<small>%</small>`;
+    document.getElementById(k + "b").style.width = v + "%";
+    document.getElementById(k + "d").style.left = v + "%";
+  }
+  tmp.textContent = DATA.temp == null ? "—" : `${DATA.temp} °C`;
+  dsk.textContent = `${DATA.disk} %`;
+  net.textContent = `${DATA.net} MB/s`;
+};
+render();
+</script>
+<script src="status.js"></script></body></html>

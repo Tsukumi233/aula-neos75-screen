@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- Néos millennium clock on the stock "Page 2" background: our classic retro_clock (after "nixie-tube-clock"
+     by K Rajtilak, https://github.com/rajtilak-2020/nixie-tube-clock, MIT; its Digitalism segment font in
+     design/widgets/third_party) moved into the official glass capsule. The digits glow cool silver-blue, the
+     moonlight of "Selene", instead of the tube's orange; the baked blurred "NEO" stays as a faint reflection. -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="neos.css">
+<style>
+@font-face { font-family: Digitalism; src: url(../widgets/third_party/nixie-tube-clock/digitalism.woff) format("woff"); }
+/* dim the capsule's baked letters so the digits read first; same stadium shape as the glass */
+.veil { position: absolute; left: 180px; top: 92px; width: 266px; height: 176px; border-radius: 88px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,.72), rgba(0,0,0,.45) 70%, rgba(0,0,0,.2)); }
+.digits { position: absolute; left: 180px; width: 266px; top: 128px; text-align: center; font-family: Digitalism;
+  font-size: 84px; line-height: 1; letter-spacing: 2px; color: #eef3ff; white-space: nowrap;
+  text-shadow: 0 0 4px rgba(255,255,255,.9), 0 0 14px rgba(170,195,255,.65), 0 0 34px rgba(120,150,255,.35); }
+.ghost { position: absolute; left: 180px; width: 266px; top: 128px; text-align: center; font-family: Digitalism;
+  font-size: 84px; line-height: 1; letter-spacing: 2px; color: rgba(200,215,255,.06); white-space: nowrap; }
+.sec { position: absolute; left: 180px; width: 266px; top: 224px; text-align: center; font-family: Digitalism;
+  font-size: 22px; letter-spacing: 6px; color: #c9d6ff; text-shadow: 0 0 10px rgba(150,180,255,.6); }
+.side { position: absolute; left: 20px; width: 140px; }
+</style></head><body>
+<img class="bg" src="../official/jpg/page2_bg.jpg">
+<div class="veil"></div>
+<div class="ghost">88:88</div>
+<div class="digits" id="hm"></div>
+<div class="sec" id="sec"></div>
+<div class="side" style="top:170px"><span class="lbl">Chronometer</span></div>
+<div class="side" style="top:190px;font-size:22px;font-weight:300" id="wd"></div>
+<div class="side dim" style="top:222px;font-size:14px;font-weight:300" id="dt"></div>
+<div class="side dim" style="top:244px;font-size:14px;font-weight:300" id="wk"></div>
+<script src="../widgets/data.js"></script>
+<script>
+window.render = () => {
+  const [h, m, s] = DATA.hms;
+  hm.textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  sec.textContent = String(s).padStart(2, "0");
+  wd.textContent = DATA.weekday;
+  dt.textContent = `${DATA.day} ${DATA.month.slice(0, 3)} ${DATA.year}`;
+  wk.textContent = DATA.next;
+};
+render();
+</script>
+<script src="status.js"></script></body></html>

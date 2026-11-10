@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- Hi-Fi clock. Dial adapted from "CSS Clock (BC17 Braun x Paul Smith)" by Paul Noble,
+     https://codepen.io/paulnoble/pen/gbPGMZZ (CodePen, MIT). Kept: rims, numerals, dashes, hands, the
+     multicolour second hand and the centre cap, nearly verbatim (SCSS nesting flattened, TypeScript to JS).
+     Changed: fixed 336 px size for the 480x360 screen, brand logos removed, time from data instead of the
+     CSS animation, date panel added on the gunmetal background. -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&display=block" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+:root {
+  --color-bg-top-left: #474447; --color-bg-bottom-right: #0E0E0E; --color-shadow: #080606;
+  --color-numerals: #CFD8DF; --color-dial-base: #060201; --color-dial-highlight: #D3DADE;
+  --font-size-numerals: 25px;
+  --dim-clock-size: 336px;
+  --dim-numerals-offset: calc(var(--dim-clock-size) * -0.415);
+  --dim-dash-offset: calc(var(--dim-clock-size) * -0.462);
+  --dim-dash-size: calc(var(--dim-clock-size) * 0.023);
+  --dim-center-size: calc(var(--dim-clock-size) * 0.048);
+  --dim-dash-width: calc(var(--dim-dash-size) * 0.2);
+  --dim-hour-hand-height: calc(var(--dim-clock-size) * 0.28);
+  --dim-hour-hand-width: calc(var(--dim-hour-hand-height) * 0.07);
+  --dim-minute-hand-height: calc(var(--dim-clock-size) * 0.37);
+  --dim-minute-hand-width: calc(var(--dim-minute-hand-height) * 0.04);
+  --dim-second-hand-height: calc(var(--dim-clock-size) * 0.48);
+  --dim-second-hand-width: calc(var(--dim-second-hand-height) * 0.02);
+  --dim-inner-rim-size: 76%;
+}
+html, body { margin: 0; width: 480px; height: 360px; overflow: hidden; }
+body { position: relative; background: radial-gradient(ellipse at 30% 40%, #33373b 0%, #2B2E31 55%, #222427 100%); font-family: Inter, sans-serif; color: #ECEAE5; }
+.clock { position: absolute; left: 12px; top: 12px; width: var(--dim-clock-size); aspect-ratio: 1; border-radius: 50%;
+  background-image: linear-gradient(to bottom right, var(--color-bg-top-left), var(--color-bg-bottom-right) 60%);
+  border: 2px solid var(--color-bg-bottom-right); box-shadow: inset 1px 1px 1px 0px rgba(255,255,255,.25), 0 10px 30px rgba(0,0,0,.45); overflow: hidden; }
+.outer-rim { position: absolute; inset: 0; margin: auto; width: 97.5%; aspect-ratio: 1; border-radius: 50%; background-color: transparent;
+  box-shadow: inset -1px -1px 1px 0px rgba(255,255,255,.2), inset 3px 3px 24px 16px var(--color-shadow); }
+.outer-rim--faint { z-index: 4; opacity: .66; }
+.inner-rim { position: absolute; inset: 0; width: var(--dim-inner-rim-size); aspect-ratio: 1; margin: auto; border-radius: 50%;
+  box-shadow: inset 3px 3px 12px var(--color-shadow), inset -2px -2px 3px 0px rgba(255,255,255,.08), -1px -1px 2px 0 var(--color-shadow); }
+.numbers { position: absolute; inset: 0; width: 0; height: 0; margin: auto; overflow: visible; font-family: Helvetica, Arial, sans-serif; }
+.numbers__number { color: var(--color-numerals); position: absolute; display: flex; align-items: center; justify-content: center; width: 0; height: 0;
+  overflow: visible; font-size: var(--font-size-numerals); text-shadow: 0 0 1px var(--color-numerals); }
+.numbers__dash { position: absolute; display: flex; align-items: center; justify-content: center; width: 0; height: 0; overflow: visible; }
+.numbers__dash span { display: block; width: var(--dim-dash-width); height: var(--dim-dash-size); background-color: var(--color-numerals); border-radius: 1px; flex: 1; color: transparent; }
+.dial { position: absolute; inset: 0; overflow: visible; width: 2px; height: 2px; margin: auto; display: flex; align-items: center; justify-content: center; }
+.dial__hand { position: absolute; width: var(--dim-hour-hand-width); height: var(--dim-hour-hand-height); transform-origin: 50% 100%; bottom: 0; left: 0; border-radius: 3px;
+  background-image: linear-gradient(to top, var(--color-dial-base), var(--color-dial-base) 40%, var(--color-dial-highlight) 40.5%); box-shadow: 2px 2px 12px rgba(0,0,0,.4); }
+.dial__container { position: absolute; inset: 0; }
+.dial__container--seconds { z-index: 2; } .dial__container--minutes, .dial__container--hours { z-index: 1; }
+.dial__hand--minute { width: var(--dim-minute-hand-width); height: var(--dim-minute-hand-height); box-shadow: 2px 2px 8px rgba(0,0,0,1); }
+.dial__second { position: absolute; width: var(--dim-second-hand-width); height: var(--dim-second-hand-height); transform-origin: 50% 100%; bottom: 0;
+  left: calc(var(--dim-second-hand-width) / -2); z-index: 2; }
+.dial__second::after { content: ''; position: absolute; inset: 0; clip-path: polygon(0 100%, 100% 100%, 80% 0, 20% 0); border-radius: 12px 12px 4px 4px;
+  background-image: linear-gradient(to top, #2D7287, #2D7287 10%, #F56F4F 10%, #F56F4F 40%, #EF852B 40%, #EF852B 60%, #E3BAAF 60%, #E3BAAF 76%, #9ECBAF 76%); }
+.dial__second::before { content: ''; position: absolute; inset: 0; background-color: black; opacity: .4; filter: blur(3px); }
+.dial__second-back { position: absolute; width: calc(var(--dim-second-hand-width) * 3); height: calc(var(--dim-second-hand-height) * .23); border-radius: 10px; bottom: 0;
+  left: calc(var(--dim-second-hand-width) * -1.5); z-index: 2; transform-origin: 50% 100%; background-image: linear-gradient(to top, #2D7287, #2D7287 40%, #148BA5 40%); }
+.dial__center { width: var(--dim-center-size); height: var(--dim-center-size); border-radius: 50%; position: absolute; background-color: #2D7287; z-index: 3; }
+.dial__center::before, .dial__center::after { position: absolute; inset: 20%; aspect-ratio: 1; background-color: #366269; content: ''; border-radius: 50%; box-shadow: 1px 1px 3px rgba(0,0,0,.66); }
+.dial__center::after { inset: calc(20% + 1px); box-shadow: inset 1px 1px 0px 0px rgba(255,255,255,.12); }
+/* date panel (ours) */
+.side { position: absolute; left: 362px; top: 40px; width: 110px; }
+.lbl { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #8F9499; font-weight: 500; }
+.big { font-size: 64px; font-weight: 300; line-height: 1; margin: 8px 0 6px; color: #CFD8DF; }
+.rule { height: 1px; background: #43474B; margin: 22px 0; }
+.next { font-size: 14px; font-weight: 600; margin-top: 6px; line-height: 1.25; }
+.acc { color: #EF852B; margin-top: 6px; text-transform: none; letter-spacing: .02em; font-size: 12px; }
+</style></head><body>
+<div class="clock">
+  <div class="outer-rim"></div><div class="outer-rim outer-rim--faint"></div><div class="inner-rim"></div>
+  <div class="numbers"></div>
+  <div class="dial">
+    <div class="dial__container dial__container--seconds"><div class="dial__second"></div><div class="dial__second-back"></div></div>
+    <div class="dial__container dial__container--minutes"><div class="dial__hand dial__hand--minute"></div></div>
+    <div class="dial__container dial__container--hours"><div class="dial__hand"></div></div>
+    <div class="dial__center"></div>
+  </div>
+</div>
+<div class="side">
+  <div class="lbl" id="wd"></div><div class="big" id="dd"></div><div class="lbl" id="my"></div>
+  <div class="rule"></div>
+  <div class="lbl">Next</div><div class="next" id="nx"></div><div class="lbl acc" id="na"></div>
+</div>
+<script src="data.js"></script>
+<script>
+const numbers = document.querySelector(".numbers");
+for (let i = 0; i < 12; i++) {
+  const a = i * 30, el = document.createElement("div");
+  el.className = "numbers__number"; el.style.transform = `rotate(${a}deg) translateY(var(--dim-numerals-offset))`;
+  el.innerHTML = `<span style="transform:rotate(${-a}deg)">${i === 0 ? 12 : i}</span>`; numbers.appendChild(el);
+}
+for (let i = 0; i < 60; i++) {
+  const el = document.createElement("span");
+  el.className = "numbers__dash"; el.style.transform = `rotate(${i * 6}deg) translateY(var(--dim-dash-offset))`;
+  el.innerHTML = "<span>&nbsp;</span>"; numbers.appendChild(el);
+}
+window.render = () => {
+const [h, m, s] = DATA.hms;
+document.querySelector(".dial__second").style.transform = `rotate(${s * 6}deg)`;
+document.querySelector(".dial__second-back").style.transform = `rotate(${s * 6 + 180}deg)`;
+document.querySelector(".dial__hand--minute").style.transform = `rotate(${m * 6 + s * 0.1 - 1}deg)`;
+document.querySelector(".dial__container--hours .dial__hand").style.transform = `rotate(${(h % 12) * 30 + m * 0.5}deg)`;
+wd.textContent = DATA.weekday; dd.textContent = DATA.day; my.textContent = `${DATA.month.slice(0, 3)} ${DATA.year}`;
+nx.textContent = DATA.next; na.textContent = DATA.nextAt;
+};
+render();
+</script></body></html>

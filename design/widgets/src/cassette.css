@@ -1,0 +1,459 @@
+* {
+  box-sizing: border-box;
+}
+
+.clearfix:before, .clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.cassetteOuter {
+  position: relative;
+  margin: 0em auto;
+  background: #bbbbbb;
+  border-radius: 0.7em;
+  width: 20em;
+  height: 12em;
+  box-shadow: rgb(148.75, 148.75, 148.75) 0 0.6em 0 0, #0b0704 -0.9em 2em 0 0.5em;
+  padding: 1em;
+  border-top: rgb(212.5, 212.5, 212.5) solid 0.1em;
+  border-bottom: rgb(161.5, 161.5, 161.5) solid 0.1em;
+  font-family: "Lato", sans-serif;
+  line-height: 1.4em;
+  color: #4d4d4d;
+}
+.cassetteOuter:before {
+  position: absolute;
+  bottom: 1em;
+  right: 100%;
+  content: "";
+  height: 3.5em;
+  border-right: rgb(148.75, 148.75, 148.75) solid 0.2em;
+  border-top: transparent solid 0.2em;
+  border-bottom: transparent solid 0.2em;
+}
+.cassetteOuter:after {
+  position: absolute;
+  z-index: -9000;
+  bottom: 1em;
+  left: 100%;
+  content: "";
+  height: 3.5em;
+  border-left: rgb(174.25, 174.25, 174.25) solid 0.2em;
+  border-top: transparent solid 0.2em;
+  border-bottom: transparent solid 0.2em;
+}
+
+.screw {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: #5e5f5a solid 0.4em;
+  border-bottom: #5e5f5a solid 0.3em;
+  border-top: rgb(195.4810810811, 196.1351351351, 192.8648648649) solid 0.4em;
+  border-right: rgb(195.4810810811, 196.1351351351, 192.8648648649) solid 0.4em;
+  border-radius: 50%;
+  box-shadow: rgb(123.25, 123.25, 123.25) 0 -0.2em 0 0;
+}
+.screw:before {
+  position: absolute;
+  top: -0.25em;
+  right: -0.35em;
+  display: block;
+  content: "";
+  width: 0.3em;
+  height: 0.2em;
+  border-radius: 50%;
+  background: #ffffff;
+  transform: rotate(45deg);
+}
+.screw.screw1 {
+  top: 0.5em;
+  left: 0.3em;
+}
+.screw.screw1 .screwInner {
+  transform: rotate(20deg);
+}
+.screw.screw2 {
+  top: 0.5em;
+  right: 0.3em;
+}
+.screw.screw2 .screwInner {
+  transform: rotate(30deg);
+}
+.screw.screw3 {
+  bottom: 0.3em;
+  left: 0.3em;
+}
+.screw.screw3 .screwInner {
+  transform: rotate(10deg);
+}
+.screw.screw4 {
+  bottom: 0.3em;
+  right: 0.3em;
+}
+.screw.screw4 .screwInner {
+  transform: rotate(-10deg);
+}
+.screw .screwInner {
+  position: absolute;
+  top: -0.15em;
+  left: -0.225em;
+  display: block;
+  width: 0.45em;
+  height: 0.2em;
+  border-radius: 0.1em;
+  background: rgb(55.1297297297, 55.7162162162, 52.7837837838);
+}
+.screw .screwInner:after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  content: "";
+  width: 0.45em;
+  height: 0.2em;
+  border-radius: 0.1em;
+  background: rgb(55.1297297297, 55.7162162162, 52.7837837838);
+  transform: rotate(90deg);
+}
+
+.stickerOuter {
+  width: 100%;
+  height: 8em;
+  background: #bbbbbb;
+  border-radius: 0.7em;
+  border-top: rgb(161.5, 161.5, 161.5) solid 0.1em;
+  border-bottom: rgb(212.5, 212.5, 212.5) solid 0.1em;
+  position: relative;
+}
+
+.sticker {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  left: 0.2em;
+  bottom: 0.2em;
+  background: #efeeeb;
+  border-radius: 0.7em;
+  border-bottom: #888888 solid 1px;
+}
+.sticker .a-side {
+  position: absolute;
+  border-radius: 0.1em;
+  top: 0.8em;
+  left: 1em;
+  font-weight: 900;
+  display: block;
+  background: #4d4d4d;
+  color: #efeeeb;
+  width: 1.1em;
+  height: 1.1em;
+  padding-top: 0.1em;
+  line-height: 1em;
+  text-align: center;
+}
+.sticker .cursive {
+  font-family: "Shadows Into Light", cursive;
+  display: block;
+  padding: 0.5em 0.5em 0.5em 3.2em;
+  transform: rotate(-3deg);
+  color: #424ba8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+.sticker .stripe {
+  display: block;
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  border-top: #fd6139 solid 0.3em;
+  border-bottom: #4d4d4d solid 0.3em;
+}
+.sticker .c90 {
+  position: absolute;
+  bottom: -0.1em;
+  left: 3.5em;
+  color: #4b9121;
+  font-weight: 900;
+}
+.sticker .logo {
+  position: absolute;
+  bottom: -0.1em;
+  right: 3.5em;
+  font-weight: 900;
+}
+
+.middle {
+  position: relative;
+  width: 60%;
+  margin: 0.5em auto 0;
+  background: #bbbbbb;
+  padding: 0.2em;
+  border-radius: 0.4em;
+  border-top: rgb(212.5, 212.5, 212.5) solid 0.1em;
+  border-bottom: rgb(148.75, 148.75, 148.75) solid 0.1em;
+  box-shadow: #bbbbbb 0 0 0 0.5em, #888888 0 -1px 0 0.5em;
+}
+
+.circle {
+  display: block;
+  position: relative;
+  float: left;
+  width: 2.3em;
+  height: 2.4em;
+  border-radius: 50%;
+  background: #E8A33D;
+  border-top: rgb(161.5, 161.5, 161.5) solid 0.1em;
+  border-bottom: rgb(225.25, 225.25, 225.25) solid 0.1em;
+  box-shadow: inset #bbbbbb 0 0 0 0.2em, inset rgb(148.75, 148.75, 148.75) 0 0.1em 0 0.2em, inset #efeeeb 0 0.1em 0 0.4em, inset rgb(182.3333333333, 177.7916666667, 164.1666666667) 0 0.2em 0 0.4em, inset rgb(216.3502304147, 139.400921659, 25.6497695853) -0.7em 1.5em 0 0;
+}
+.circle.two {
+  float: right;
+}
+
+.teethBox {
+  position: absolute;
+  top: 50%;
+  margin-top: -0.75em;
+  left: 50%;
+  margin-left: -0.85em;
+  width: 1.7em;
+  height: 1.7em;
+  transform: rotate(var(--spin, 0deg));
+}
+
+.teeth {
+  display: block;
+  position: absolute;
+  top: 50%;
+  margin-top: -0.1em;
+  left: 50%;
+  width: 1.7em;
+  margin-left: -0.85em;
+  height: 0.2em;
+  box-shadow: inset #efeeeb 0.25em 0 0 0, inset #efeeeb -0.25em 0 0 0;
+}
+.teeth:nth-of-type(2) {
+  transform: rotate(60deg);
+}
+.teeth:nth-of-type(3) {
+  transform: rotate(-60deg);
+}
+
+.window {
+  position: absolute;
+  z-index: 2;
+  top: 0.2em;
+  left: 50%;
+  margin-left: -2.5em;
+  margin-top: 0.3em;
+  width: 5em;
+  height: 1.8em;
+  border-radius: 0.4em;
+  overflow: hidden;
+  background: rgb(216.3502304147, 139.400921659, 25.6497695853);
+  border-top: rgb(161.5, 161.5, 161.5) solid 0.1em;
+  border-bottom: rgb(225.25, 225.25, 225.25) solid 0.1em;
+  box-shadow: inset rgb(148.75, 148.75, 148.75) 0 0.2em 0 0, #bbbbbb 0 0 0 0.25em, rgb(148.75, 148.75, 148.75) 0 -0.1em 0 0.2em, rgb(225.25, 225.25, 225.25) 0 0.1em 0 0.2em;
+}
+.window .reelOne {
+  --d: calc(9em - 3em * var(--p, 0));
+  position: absolute;
+  left: -1.4em;
+  top: 0.9em;
+  display: block;
+  margin-left: calc(var(--d) / -2);
+  margin-top: calc(var(--d) / -2);
+  width: var(--d);
+  height: var(--d);
+  background: #4d3b3b;
+  border-radius: 50%;
+}
+.window .reelOne:after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  content: "";
+  width: 4em;
+  height: 4em;
+  margin: -2em 0 0 -2em;
+  border-radius: 50%;
+  background: #efeeeb;
+  border: #efeeeb solid 0.2em;
+  box-shadow: inset #dad8d2 0 0 0 0.2em;
+}
+.window .reelTwo {
+  --d: calc(6em + 3em * var(--p, 0));
+  position: absolute;
+  right: -1.4em;
+  top: 0.9em;
+  display: block;
+  margin-right: calc(var(--d) / -2);
+  margin-top: calc(var(--d) / -2);
+  width: var(--d);
+  height: var(--d);
+  background: #4d3b3b;
+  border-radius: 50%;
+}
+.window .reelTwo:after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  content: "";
+  width: 4em;
+  height: 4em;
+  margin: -2em 0 0 -2em;
+  border-radius: 50%;
+  background: #efeeeb;
+  border: #efeeeb solid 0.2em;
+  box-shadow: inset #dad8d2 0 0 0 0.2em;
+}
+
+.cassetteBottom {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 2.2em;
+  width: 10em;
+  margin-left: -5em;
+  background: rgb(199.75, 199.75, 199.75);
+  border-top: rgb(225.25, 225.25, 225.25) solid 0.1em;
+}
+.cassetteBottom .screw5 {
+  bottom: 1em;
+  left: 50%;
+  margin-left: -0.5em;
+}
+.cassetteBottom:before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  border-right: rgb(199.75, 199.75, 199.75) solid 0.5em;
+  border-top: transparent solid 2.2em;
+}
+.cassetteBottom:after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  border-left: rgb(199.75, 199.75, 199.75) solid 0.5em;
+  border-top: transparent solid 2.2em;
+}
+
+.bottomShadow {
+  position: absolute;
+  z-index: 100;
+  left: 50%;
+  margin-left: -5.5em;
+  bottom: -0.7em;
+  width: 11em;
+  height: 0.7em;
+  background: rgb(148.75, 148.75, 148.75);
+}
+.bottomShadow:before {
+  content: "";
+  display: block;
+  position: absolute;
+  z-index: 100;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5.5em;
+  width: 10.4em;
+  border-bottom: rgb(148.75, 148.75, 148.75) solid 0.1em;
+  border-right: transparent solid 0.3em;
+  border-left: transparent solid 0.3em;
+}
+.bottomShadow:after {
+  content: "";
+  display: block;
+  position: absolute;
+  z-index: 100;
+  top: 100%;
+  left: 50%;
+  margin-left: -5.5em;
+  width: 10.4em;
+  border-top: rgb(148.75, 148.75, 148.75) solid 0.1em;
+  border-right: transparent solid 0.3em;
+  border-left: transparent solid 0.3em;
+}
+
+.holes {
+  display: block;
+  position: absolute;
+  bottom: 0.8em;
+  width: 0.8em;
+  height: 0.6em;
+  border-radius: 0.2em;
+  background: rgb(97.75, 97.75, 97.75);
+  box-shadow: inset rgb(148.75, 148.75, 148.75) 0 0.1em 0 0;
+}
+.holes:after {
+  position: absolute;
+  top: 0.5em;
+  content: "";
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+  background: rgb(97.75, 97.75, 97.75);
+  box-shadow: inset rgb(148.75, 148.75, 148.75) 0 0.1em 0 0;
+}
+.holes.one {
+  left: 20%;
+}
+.holes.one:after {
+  right: 200%;
+}
+.holes.two {
+  right: 20%;
+}
+.holes.two:after {
+  left: 200%;
+}
+
+.bottomHoles {
+  position: absolute;
+  top: 0.05em;
+  width: 2em;
+  height: 0.6em;
+  background: rgb(97.75, 97.75, 97.75);
+  box-shadow: inset #4d3b3b 0 0.3em 0 0, inset rgb(123.25, 123.25, 123.25) 0 -0.1em 0 0;
+}
+.bottomHoles.one {
+  left: 0.5em;
+}
+.bottomHoles.two {
+  left: 50%;
+  margin-left: -1em;
+}
+.bottomHoles.two:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0.1em;
+  right: 140%;
+  width: 0.4em;
+  height: 0.4em;
+  background: rgb(97.75, 97.75, 97.75);
+  box-shadow: inset #4d3b3b 0 0.2em 0 0, inset rgb(123.25, 123.25, 123.25) 0 -0.05em 0 0;
+}
+.bottomHoles.two:after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0.1em;
+  left: 140%;
+  width: 0.4em;
+  height: 0.4em;
+  background: rgb(97.75, 97.75, 97.75);
+  box-shadow: inset #4d3b3b 0 0.2em 0 0, inset rgb(123.25, 123.25, 123.25) 0 -0.05em 0 0;
+}
+.bottomHoles.three {
+  right: 0.5em;
+}

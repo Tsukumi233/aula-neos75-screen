@@ -1,0 +1,114 @@
+<!doctype html>
+<!-- Retro-futurism clock. Adapted from "nixie-tube-clock" by K Rajtilak,
+     https://github.com/rajtilak-2020/nixie-tube-clock (MIT, copy and licence in third_party/nixie-tube-clock).
+     Kept: the whole tube, frame, pipes, base and segment display markup and stylesheet unchanged.
+     Changed: sized for the 480x360 screen (--_factor), power button removed, time and date from data.js
+     instead of a 60 ms timer, amber side captions added. -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="third_party/nixie-tube-clock/style.css">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=block" rel="stylesheet">
+<style>
+html, body { width:480px; height:360px; overflow:hidden; } body { position:relative; }
+body { background: linear-gradient(#040909 62%, #312c2a 86%) !important; }
+.clock { --_factor: 340px !important; --_size: 340px !important; }
+.cap { position:absolute; font-family:VT323, monospace; color:#ffb23e; text-shadow:0 0 6px rgba(255,170,50,.55); letter-spacing:.06em; z-index:50; }
+.cap.dim { color:#8a5a1a; text-shadow:none; }
+</style></head><body>
+<div class="cap" style="left:22px;top:18px;font-size:22px">CHRONOMETER</div>
+<div class="cap dim" style="left:22px;top:40px;font-size:18px">NEOS-75 // UTC+8</div>
+<div class="cap" id="wd" style="right:22px;top:18px;font-size:22px;text-align:right"></div>
+<div class="cap dim" id="nx" style="right:22px;top:40px;font-size:18px;text-align:right"></div>
+
+    
+    
+      <div class="clock on">
+        <div class="shadow"></div>
+        <div class="base-container"><div class="base"><div></div></div></div>
+        <div class="small-outer-pipe">
+          <div class="small-inner-pipe"></div>
+        </div>
+        <div class="outer-pipe">
+          <div class="inner-pipe"></div>
+        </div>
+        <div class="pipe-accents">
+          <div class="top-tube"></div>
+          <div class="tube-holders">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="top"></div>
+          <div class="topinset"></div>
+          <div class="left"><div></div><div></div><div></div></div>
+          <div class="right"><div></div><div></div><div></div></div>
+          <div class="bottom-left"></div>
+          <div class="bottom-right"></div>
+        </div>
+    
+        <div class="display">
+          <div class="row">
+            <div class="col"><div>8</div><div id="char01">0</div><div id="char02">0</div></div>
+            <div class="col"><div>8</div><div id="char11">0</div><div id="char12">0</div></div>
+          </div>
+          <div class="row">
+            <div class="col"><div>8</div><div id="char21">0</div><div id="char22">0</div></div>
+            <div class="col"><div>8</div><div id="char31">0</div><div id="char32">0</div></div>
+          </div>
+          <div style="height: 0.2em;"></div>
+          <div class="small-row">
+            <div class="row">
+              <div class="col"><div>8</div><div id="char41">0</div><div id="char42">0</div></div>
+              <div class="col"><div>8</div><div id="char51">0</div><div id="char52">0</div></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col"><div>8</div><div id="char61">0</div><div id="char62">0</div></div>
+            <div class="col"><div>8</div><div id="char71">0</div><div id="char72">0</div></div>
+          </div>
+          <div class="row">
+            <div class="col"><div>8</div><div id="char81">0</div><div id="char82">0</div></div>
+            <div class="col"><div>8</div><div id="char91">0</div><div id="char92">0</div></div>
+          </div>
+          <div class="row">
+            <div class="col"><div>8</div><div id="char101">0</div><div id="char102">0</div></div>
+            <div class="col"><div>8</div><div id="char111">0</div><div id="char112">0</div></div>
+          </div>
+        </div>
+    
+        <div class="glass-tube"></div>
+        <div class="hex">
+          <div class="overlay"></div>
+        </div>
+    
+        <div class="tube-base-container">
+          <div class="tube-base"></div>
+          <div class="rods">
+            <div class="left-rod"></div>
+            <div class="center-rod"></div>
+            <div class="right-rod"></div>
+          </div>
+          <div class="tube-btm"></div>
+        </div>
+    
+        </div> 
+      </div>
+      
+
+<script src="data.js"></script>
+<script>
+window.render = () => {
+// same formatting as the original main.js: hhmm, AM/PM, month, day, year (12 characters)
+let [h, m] = DATA.hms; const ampm = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+const months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+let mo = String(months.indexOf(DATA.month.toLowerCase()) + 1).padStart(2, " ");
+let d = String(+DATA.day).padStart(2, " ");
+const str = String(h).padStart(2, " ") + String(m).padStart(2, "0") + ampm + mo + d + DATA.year.slice(-2);
+for (let i = 0; i < 12; i++) { document.getElementById("char" + i + "1").textContent = str[i]; document.getElementById("char" + i + "2").textContent = str[i]; }
+wd.textContent = DATA.weekday.slice(0, 3).toUpperCase() + " " + DATA.day;
+nx.textContent = DATA.nextLive ? "NEXT " + DATA.nextAt.split(" ")[0] : DATA.next.toUpperCase();
+};
+render();
+</script></body></html>

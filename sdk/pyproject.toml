@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neos75screen"
+version = "0.1.0"
+description = "Host SDK for the realtime screen protocol of a patched AULA Neos75 keyboard screen"
+readme = "README.md"
+license = "GPL-3.0-only"
+requires-python = ">=3.10"
+dependencies = [
+    "hidapi>=0.14",
+    "pillow>=10.1",
+    "qmk-via-api>=0.10.1",   # the keyboard's VIA protocol (via.py), GPL-3.0
+    "pykle-serial>=0.1.1",   # keyboard layout (KLE) of the VIA definition, MIT
+    "websocket-client>=1.6", # DevTools connection of the widget browser (live/cdp.py), Apache-2.0
+]
+
+[project.optional-dependencies]
+numpy = ["numpy>=1.24"]
+sysmon = ["psutil>=5.9"]
+gpu = ["nvidia-ml-py>=12"]
+widgets = ["psutil>=5.9", "winrt-Windows.Media.Control>=2", "pycaw>=20240316", "soundcard>=0.4", "numpy>=1.24"]  # live widget pages (Windows); rendered in Chrome/Edge over DevTools (live/cdp.py)
+check = ["playwright>=1.40"]  # `neos75ctl check`: console errors and failed requests of a page
+test = ["pytest>=7", "numpy>=1.24", "psutil>=5.9"]
+
+[project.scripts]
+neos75 = "neos75screen.cli:main"
+neos75d = "neos75screen.service.server:main"      # screen service (localhost API), see service/API.md
+neos75ctl = "neos75screen.service.cli:main"       # CLI for the service (--json for agents)
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"neos75screen.service" = ["templates/*.html", "API.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

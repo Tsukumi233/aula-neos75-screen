@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; img-src 'self' file: data: http://127.0.0.1:*; connect-src http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; font-src 'self'">
+<title>Neos75</title>
+<link rel="stylesheet" href="../node_modules/misans/lib/Normal/MiSans-ExtraLight.min.css">
+<link rel="stylesheet" href="../node_modules/misans/lib/Normal/MiSans-Light.min.css">
+<link rel="stylesheet" href="../node_modules/misans/lib/Normal/MiSans-Regular.min.css">
+<link rel="stylesheet" href="../node_modules/misans/lib/Normal/MiSans-Medium.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="titlebar">
+  <div class="brand">
+    <div class="art wordmark" data-art="page2_bg.jpg" data-crop="14,314,96,34"><span class="fallback">NÉOS</span></div>
+    <div class="brand-sep"></div>
+    <div class="brand-title">Neos75</div>
+    <div class="sim-badge hidden" id="sim-badge" title="界面连着模拟设备（npm run fake / neos75d --fake）：画面、电量、按键都不是你键盘的真实数据">模拟设备 · 不是你的键盘</div>
+  </div>
+  <div class="art aula" data-art="page2_bg.jpg" data-crop="173,316,290,28"></div>
+  <div class="tb-status" id="tb-status"></div>
+</header>
+
+<div class="shell">
+  <!-- navigation: the keyboard's parts, the screen, this PC — side by side, as in Aula Hub -->
+  <nav class="sidebar" id="nav">
+    <div class="nav-group">键盘</div>
+    <button class="nav-item" data-view="keys"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7 14h10"/></svg>按键</button>
+    <button class="nav-item" data-view="knobs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M12 4.5V9"/><path d="M4 4.5a11 11 0 0 1 4-2.2M20 4.5a11 11 0 0 0-4-2.2"/></svg>旋钮</button>
+    <button class="nav-item" data-view="macros"><svg viewBox="0 0 24 24"><path d="M5 6h9M5 12h14M5 18h7"/><path d="M17 15l3 3-3 3"/></svg>宏</button>
+    <button class="nav-item" data-view="advanced"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h.01M15 9h.01M9 15h6"/></svg>高级键</button>
+    <button class="nav-item" data-view="lighting"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>灯光</button>
+    <button class="nav-item" data-view="performance"><svg viewBox="0 0 24 24"><path d="M4 20a8 8 0 1 1 16 0"/><path d="M12 20l4-6"/></svg>性能</button>
+    <div class="nav-group">屏幕</div>
+    <button class="nav-item" data-view="screen"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M9 21h6"/></svg>屏幕页面<span class="nav-dot" id="nav-screen-dot"></span></button>
+    <div class="nav-group">本机</div>
+    <button class="nav-item" data-view="device"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>设备与备份</button>
+    <button class="nav-item" data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>应用设置</button>
+    <button class="nav-item" data-view="log"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7"/></svg>日志</button>
+    <div class="nav-foot">
+      <div class="nav-mirror bezel tiny"><div class="mirror"><img id="nav-mirror" alt=""></div></div>
+      <div class="dim" id="nav-screen-text">屏幕 —</div>
+    </div>
+  </nav>
+
+  <main class="views" id="views">
+    <!-- keyboard views share one head: title, layer, link -->
+    <section class="view kb-view" data-view="keys">
+      <div class="view-head"><div><h2>按键</h2><p class="dim">点键盘上的一个键，再在下面选它要变成什么。改动立即写进键盘，换电脑、不开本应用也有效。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+    <section class="view kb-view" data-view="knobs">
+      <div class="view-head"><div><h2>旋钮</h2><p class="dim">两个旋钮的每个动作，可以写进键盘（任何电脑都有效），也可以交给电脑端执行（打开程序、组合键、按住转动；需本应用在运行）。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+    <section class="view kb-view" data-view="macros">
+      <div class="view-head"><div><h2>宏</h2><p class="dim">一个键按下后依次发出一串按键、延时和文字。宏存在键盘里；到「按键」把某个键设成「宏 n」即可使用。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+    <section class="view kb-view" data-view="advanced">
+      <div class="view-head"><div><h2>高级键</h2><p class="dim">一个键按“点按、按住、双击、点按后按住”分别做不同的事（官方驱动里的“按住/单击 MT”）。存在键盘里，到「按键」把某个键设成「高级键 n」。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+    <section class="view kb-view" data-view="lighting">
+      <div class="view-head"><div><h2>灯光</h2><p class="dim">键盘背光的灯效、亮度、速度和颜色，保存在键盘里。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+    <section class="view kb-view" data-view="performance">
+      <div class="view-head"><div><h2>性能</h2><p class="dim">按键响应、防抖、睡眠和系统模式，保存在键盘里。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+    <section class="view kb-view" data-view="device">
+      <div class="view-head"><div><h2>设备与备份</h2><p class="dim">键盘和屏幕的连接、电量、固件与备份。</p></div>
+        <div class="view-tools" data-kb-tools></div></div>
+      <div class="kb-body" data-kb-body></div>
+    </section>
+
+    <!-- the screen: what it shows now, the knob cycle, the page library -->
+    <section class="view" data-view="screen">
+      <div class="layout">
+        <aside class="device">
+          <div class="section-label">屏幕</div>
+          <div class="bezel">
+            <div class="mirror" id="mirror">
+              <img id="mirror-img" alt="">
+              <div class="mirror-sim hidden" id="mirror-sim">模拟设备 · 非真实画面</div>
+              <div class="mirror-idle" id="mirror-idle">
+                <div class="art ring" data-art="sg25.jpg" data-crop="53,3,134,134" data-size="96"></div>
+                <div id="mirror-idle-text">未运行</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- the stock status bar, live: page pill | B, battery | Bluetooth, wired, 2.4G -->
+          <div class="statusbar">
+            <div class="pill page-pill" id="sb-page">—</div>
+            <div class="sb-sep"></div>
+            <div class="sb-item"><div class="pill round">B</div><i class="dot" id="sb-charge"></i></div>
+            <div class="sb-item"><div class="pill" id="sb-battery">Battery</div><i class="dot hidden"></i></div>
+            <div class="sb-sep"></div>
+            <div class="sb-item"><div class="pill round" title="蓝牙">BT</div><i class="dot" id="sb-bt"></i></div>
+            <div class="sb-item"><div class="pill round" title="有线">USB</div><i class="dot" id="sb-wired"></i></div>
+            <div class="sb-item"><div class="pill" title="2.4G">2.4G</div><i class="dot" id="sb-24g"></i></div>
+          </div>
+
+          <dl class="facts">
+            <dt>显示</dt><dd id="f-runner">—</dd>
+            <dt>设备</dt><dd id="f-device">—</dd>
+            <dt>帧率</dt><dd id="f-fps">—</dd>
+            <dt>键盘</dt><dd id="f-keyboard">—</dd>
+          </dl>
+
+          <div class="actions">
+            <button class="pill primary" id="btn-run">开始显示</button>
+            <button class="pill" id="btn-restart">重启</button>
+          </div>
+
+          <div class="knob-sim hidden" id="knob-sim">
+            <div class="section-label">旋钮 <span class="dim" id="knob-sim-note">（模拟设备）</span></div>
+            <div class="knob-row">
+              <button class="pill round" data-knob="-1" title="逆时针">‹</button>
+              <button class="pill" data-knob="0" id="knob-press">按下</button>
+              <button class="pill round" data-knob="1" title="顺时针">›</button>
+              <span class="knob-flash" id="knob-flash"></span>
+            </div>
+          </div>
+
+          <div class="agent-hint">
+            <div class="section-label">给智能体</div>
+            <code>neos75ctl status --json</code>
+            <code>neos75ctl pages add neos_nixie --at 8</code>
+          </div>
+        </aside>
+
+        <div class="content" id="content">
+          <section class="cycle-section">
+            <div class="section-head">
+              <div>
+                <h2>旋钮循环</h2>
+                <p class="dim">转动屏幕旋钮依次经过原厂 Page 1–6，然后是你的页面（最多 8 个）。拖动排序，拖入页面库里的页面即可添加。</p>
+              </div>
+              <div class="count pill" id="cycle-count">0 / 8</div>
+            </div>
+            <div class="cycle" id="cycle"></div>
+          </section>
+
+          <section class="library-section" id="library-section">
+            <div class="section-head">
+              <div>
+                <h2>页面库</h2>
+                <p class="dim">每个 480×360 的网页都是一个页面。新页面放进 <code>design/custom</code> 即可出现在这里。</p>
+              </div>
+              <div class="filters" id="filters">
+                <button class="pill active" data-filter="all">全部</button>
+                <button class="pill" data-filter="neos">Néos</button>
+                <button class="pill" data-filter="custom">我的页面</button>
+                <button class="pill" data-filter="classic">经典</button>
+              </div>
+            </div>
+            <div class="library" id="library"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- app settings -->
+    <section class="view" data-view="settings">
+      <div class="view-head"><div><h2>应用设置</h2><p class="dim">这台电脑上的本应用和屏幕服务。</p></div></div>
+      <div class="panel narrow-panel">
+        <div class="setting"><div><div>开机时启动</div><div class="dim">登录 Windows 后在托盘里启动，并开始显示</div></div>
+          <label class="switch"><input type="checkbox" id="s-autostart"><i></i></label></div>
+        <div class="setting"><div><div>关闭窗口时隐藏到托盘</div><div class="dim">屏幕继续显示、旋钮动作继续生效；从托盘图标退出</div></div>
+          <label class="switch"><input type="checkbox" id="s-tray"><i></i></label></div>
+        <div class="setting"><div><div>服务启动后自动开始显示</div><div class="dim">关闭后需在「屏幕页面」里手动点“开始显示”</div></div>
+          <label class="switch"><input type="checkbox" id="s-run"><i></i></label></div>
+        <div class="setting"><div><div>刷新间隔</div><div class="dim">页面未设置 data-fps 时，每帧间隔（秒）</div></div>
+          <input class="field narrow" type="number" id="s-interval" min="0.1" max="60" step="0.1"></div>
+        <div class="setting"><div><div>画质</div><div class="dim">发送到屏幕的 JPEG 质量（30–95）</div></div>
+          <input class="field narrow" type="number" id="s-quality" min="30" max="95" step="1"></div>
+        <div class="setting col"><div><div>额外页面文件夹</div><div class="dim">这些文件夹里的 .html 也会出现在页面库</div></div>
+          <div class="dirs" id="s-dirs"></div>
+          <div><button class="pill" id="s-add-dir">添加文件夹…</button></div></div>
+        <div class="about dim" id="s-about"></div>
+      </div>
+    </section>
+
+    <!-- log -->
+    <section class="view" data-view="log">
+      <div class="view-head"><div><h2>日志</h2><p class="dim">屏幕服务的最近记录（键盘写入、旋钮动作、屏幕连接）。</p></div></div>
+      <pre class="panel" id="log-lines"></pre>
+    </section>
+  </main>
+</div>
+
+<!-- page drawer: preview, options, add / save / remove -->
+<div class="scrim hidden" id="scrim"></div>
+<aside class="drawer hidden" id="drawer">
+  <div class="drawer-head">
+    <div class="pill page-pill" id="d-label">Page 7</div>
+    <button class="pill ghost round" id="d-close" title="关闭">×</button>
+  </div>
+  <div class="bezel small"><div class="mirror"><img id="d-preview" alt=""><div class="loading" id="d-loading"></div></div></div>
+  <h3 id="d-title"></h3>
+  <p class="dim" id="d-desc"></p>
+  <div class="d-meta dim" id="d-meta"></div>
+  <form class="options" id="d-options" autocomplete="off"></form>
+  <div class="d-entry"><span class="dim">条目</span><code id="d-entry"></code></div>
+  <div class="drawer-actions">
+    <button class="pill primary" id="d-primary">添加到旋钮</button>
+    <button class="pill" id="d-remove">从旋钮移除</button>
+    <button class="pill ghost" id="d-file">打开文件位置</button>
+  </div>
+</aside>
+
+<div class="toast hidden" id="toast"></div>
+<script src="keyboard.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

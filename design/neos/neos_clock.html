@@ -1,0 +1,25 @@
+<!doctype html>
+<!-- Néos clock on the stock "Page 3" (timer) background: the chrome ring and both panels are the official
+     artwork; the "Timer Mode" pill is replaced by "Clock", date beside the ring, live time in the lower panel. -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="neos.css"></head><body>
+<img class="bg" src="../official/jpg/page3_bg.jpg">
+<!-- cover the baked "Timer Mode" pill, then draw ours in the same style -->
+<div class="abs" style="left:322px;top:96px;width:136px;height:36px;background:url(../official/jpg/page3_bg.jpg) -180px -96px"></div>
+<div class="pill" style="right:34px;top:102px">Clock</div>
+<div class="abs" style="left:104px;top:104px;font-size:17px;font-weight:400" id="wd"></div>
+<div class="abs dim" style="left:104px;top:128px;font-size:14px;font-weight:300" id="dt"></div>
+<div class="abs big" style="left:40px;top:212px;font-size:72px;white-space:nowrap"><span id="hm"></span><span class="dim" style="font-size:36px" id="sec"></span></div>
+<div class="abs lbl" style="left:40px;top:194px">Local time</div>
+<script src="../widgets/data.js"></script>
+<script>
+window.render = () => {
+  const [h, m, s] = DATA.hms;
+  hm.textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  sec.textContent = `:${String(s).padStart(2, "0")}`;
+  wd.textContent = DATA.weekday;
+  const mi = MONTHS.indexOf(DATA.month) + 1;
+  dt.textContent = `${DATA.year}-${String(mi).padStart(2, "0")}-${DATA.day}  ·  ${DATA.next}`;
+};
+render();
+</script>
+<script src="status.js"></script></body></html>

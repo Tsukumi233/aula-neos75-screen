@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- Néos picture page, like the stock custom-image page 5: the official left strip and your picture in the
+     stock 320x320 spot at (140,20). Options (selection entry `neos_photo?...`):
+       src=<file path or URL>   the picture (JPEG/PNG/WebP/GIF/SVG; an animated GIF plays at the frame rate)
+       full=1                   the whole 480x360 screen, no strip
+       fit=cover|contain        default cover
+       pill=0                   no page number pill
+     One widget, as many pages as pictures: `neos75 pages neos_photo?src=D:/a.jpg "neos_photo?src=D:/b.png&full=1"`. -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="neos.css">
+<style>
+#pic { position: absolute; object-fit: cover; }
+.empty { position: absolute; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  border: 1px dashed rgba(255,255,255,.25); border-radius: 8px; color: #8c8c8c; font-size: 13px; text-align: center; }
+</style></head><body data-status="off">
+<script>
+const P = new URLSearchParams(location.search), full = P.get("full") === "1";
+if (P.get("pill") === "0") document.body.dataset.pill = "-200,-200";
+const box = full ? [0, 0, 480, 360] : [140, 20, 320, 320];
+if (!full) document.write('<img class="strip" src="../official/jpg/page5_bg.jpg">');
+const src = P.get("src");
+const place = e => Object.assign(e.style, {left: box[0] + "px", top: box[1] + "px", width: box[2] + "px", height: box[3] + "px"});
+if (src) {
+  const img = document.createElement("img"); img.id = "pic";
+  img.src = /^[a-z]+:\/\//i.test(src) ? src : "file:///" + src.replace(/\\/g, "/");
+  img.style.objectFit = P.get("fit") === "contain" ? "contain" : "cover";
+  place(img); document.body.appendChild(img);
+} else {
+  const e = document.createElement("div"); e.className = "empty";
+  e.innerHTML = "Your picture here<br>neos_photo?src=D:/pictures/a.jpg";
+  place(e); document.body.appendChild(e);
+}
+</script>
+<script src="../widgets/data.js"></script>
+<script src="status.js"></script></body></html>

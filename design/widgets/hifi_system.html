@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- Hi-Fi system monitor. Adapted from "Skeuomorphic boombox" by J Lopes (offeringofpie),
+     https://codepen.io/offeringofpie/pen/ogveLjq (CodePen, MIT). Kept: the brushed silver body, the black
+     gauge strip and the two VU meters (scale arc, red zone, needle, needle base), the vertical faders with
+     knurled thumbs and the round indicator lamps, nearly verbatim. Changed: meters show CPU and GPU load
+     instead of audio level, faders show memory, temperature, disk and network, lamps show status; sized for
+     480x360 on the gunmetal background; no audio or controls. -->
+<html><head><meta charset="utf-8"><style>
+html, body { margin: 0; width: 480px; height: 360px; overflow: hidden; }
+body { position: relative; background: #2B2E31; font-family: Arial, Helvetica, sans-serif; }
+.boombox { position: absolute; inset: 6px; display: flex; flex-direction: column; border-radius: 1rem; padding: 10px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.2), inset 0 0 1px 2px rgba(255,255,255,.9), inset 0 -6px 5px rgba(0,0,0,.1), 0 6px 7px rgba(0,0,0,.3), 0 4px 1px rgba(0,0,0,.5);
+  background-color: hsl(0,0%,90%); background-image: linear-gradient(180deg, rgb(179,179,179) 0%, rgb(230,230,230) 50%, rgb(179,179,179) 100%); }
+/* VU meter rules (original) */
+#gauge { display: flex; justify-content: space-around; padding: 0; width: 500px; background: black; overflow: hidden; margin: 0 auto; border-radius: 8px; position: relative;
+  transform: scale(.896); transform-origin: top left; margin-bottom: -12px; }
+.vu-meter { width: 250px; height: 150px; position: relative; background: white; border-radius: 150rem 150rem 0 0;
+  box-shadow: inset -10px -10px 50px rgba(22,22,22,.3), inset 10px 20px 30px -16px rgba(255,255,255,.5);
+  clip-path: polygon(0 15%, 100% 15%, 100% 90%, 0 90%); margin: -25px 0 -15px; background: linear-gradient(#fbf6e8, #efe6cf); }
+.needle { border-bottom: 5px solid transparent; border-radius: 15px; border-right: 120px solid rgba(0,0,0,.8); border-top: 5px solid transparent; bottom: 10px; height: 0; left: 5px;
+  position: absolute; transform-origin: 100% 50%; transform: rotate(20deg); width: 0; z-index: 1; opacity: .8; }
+.label { position: absolute; left: 22px; top: 70%; font-size: 15px; color: #222; letter-spacing: .08em; }
+.label b { position: absolute; left: 172px; top: 0; font-size: 15px; font-weight: bold; color: #222; white-space: nowrap; }
+.needle-base { width: 75px; height: 35px; position: absolute; bottom: 0; left: 87px; z-index: 9; overflow: hidden; background: #333; border-radius: 35px 35px 0 0;
+  box-shadow: 0 0 10px -5px, inset -10px -10px 50px rgba(22,22,22,.3), inset 10px 20px 30px -16px rgba(255,255,255,.5); }
+.meterLine { width: 250px; height: 97px; position: absolute; top: 8px; left: 50%; overflow: hidden; z-index: 1; transform: translateX(-50%); }
+.meterLine span.base { width: 180px; height: 180px; position: absolute; left: 25px; top: 32px; border-radius: 100%; border: solid 1px black; }
+.meterLine .danger { width: 30%; position: absolute; height: 75px; left: 145px; top: 22px; overflow: hidden; }
+.meterLine .danger span.base { position: absolute; left: -128px; top: 0; border: solid 10px #a00; }
+/* faders and lamps (original styles, applied to read-only controls) */
+#adjust { display: flex; flex: 1 1 auto; margin: 0 8px; align-items: center; gap: 18px; }
+.presets { display: flex; flex-direction: column; align-items: end; gap: 5px; }
+.presets label { display: flex; align-items: center; font-size: 13px; }
+.lamp { width: 18px; height: 18px; border-radius: 50%; margin-left: 10px; position: relative; }
+.lamp::before { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,.2), inset 0 0 15px #000; }
+.lamp.on::before { background-color: #9aa; box-shadow: inset 0 0 10px -5px rgba(0,0,0,1), 0 0 5px rgba(255,255,255,.8); }
+.presets span { text-transform: uppercase; color: #444; text-shadow: 1px 1px 1px rgba(255,255,255,.6); }
+.presets .on-l span { color: #6f8080; }
+#eq { display: flex; align-items: flex-end; gap: 14px; flex-grow: 1; justify-content: center; }
+.fader { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.fader .track { position: relative; width: 20px; height: 112px; border-radius: 6px; background: rgba(0,0,0,.7); border: 1px solid #111;
+  box-shadow: inset 0 4px 8px rgba(0,0,0,.8), inset 0 -4px 8px rgba(20,20,20,.8); }
+.fader .thumb { position: absolute; left: 50%; width: 30px; height: 20px; transform: translate(-50%, 50%); border: 1px solid rgba(255,255,255,.1); border-radius: 25%; background: #888;
+  background-image: linear-gradient(to bottom, rgba(170,170,170,.35) 0%, rgba(255,255,255,.44) 50%, rgba(255,255,255,.53) 100%),
+    repeating-linear-gradient(45deg, #8882 0px, #8882 1px, #9992 1px, #9992 2px, #aaa2 2px, #aaa2 3px),
+    repeating-linear-gradient(-45deg, #8882 0px, #8882 1px, #9992 1px, #9992 2px, #aaa2 2px, #aaa2 3px);
+  background-blend-mode: overlay; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2), inset 0 0 1px 1px rgba(255,255,255,.9), inset 0 -6px 3px rgba(0,0,0,.1), 0 6px 7px rgba(0,0,0,.3), 0 2px 1px rgba(0,0,0,.5); }
+.fader .name { font-size: 12px; text-transform: uppercase; color: #444; text-shadow: 1px 1px 1px rgba(255,255,255,.6); }
+.fader .val { font-size: 13px; color: #222; font-weight: bold; }
+</style></head><body>
+<div class="boombox">
+  <div id="gauge">
+    <div class="vu-meter" id="m1"><div class="needle"></div><div class="label">CPU<b></b></div>
+      <div class="meterLine"><span class="base"></span><div class="danger"><span class="base"></span></div></div><div class="needle-base"></div></div>
+    <div class="vu-meter" id="m2"><div class="needle"></div><div class="label">GPU<b></b></div>
+      <div class="meterLine"><span class="base"></span><div class="danger"><span class="base"></span></div></div><div class="needle-base"></div></div>
+  </div>
+  <div id="adjust">
+    <div class="presets" id="lamps"></div>
+    <div id="eq"></div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script>
+// needle: 20 deg at rest, about 160 deg at full scale (the red zone starts near 80 %)
+const angle = v => 22 + Math.max(0, Math.min(100, v)) * 1.36;
+window.render = () => {
+for (const [id, v] of [["m1", DATA.cpu], ["m2", DATA.gpu]]) {
+  const m = document.getElementById(id);
+  m.querySelector(".needle").style.transform = `rotate(${angle(v)}deg)`;
+  m.querySelector(".label b").textContent = `${v} %`;
+}
+const temp = DATA.temp == null ? 0 : DATA.temp;
+const faders = [["Mem", DATA.mem, `${DATA.mem}%`], ["Temp", temp, DATA.temp == null ? "—" : `${DATA.temp}°`], ["Disk", DATA.disk, `${DATA.disk}%`], ["Net", Math.min(100, DATA.net * 4), `${DATA.net}M`]];
+eq.innerHTML = faders.map(([n, v, t]) => `<div class="fader"><div class="track"><div class="thumb" style="bottom:${8 + v * 0.96}px"></div></div>
+  <div class="name">${n}</div><div class="val">${t}</div></div>`).join("");
+const lamps = [["Online", true], ["Net", DATA.net > 0.05], ["Busy", DATA.cpu > 70], ["Hot", temp > 80], ["Music", !!DATA.playing]];
+document.getElementById("lamps").innerHTML = lamps.map(([n, on]) => `<label class="${on ? "on-l" : ""}"><span>${n}</span><i class="lamp ${on ? "on" : ""}"></i></label>`).join("");
+};
+render();
+</script></body></html>

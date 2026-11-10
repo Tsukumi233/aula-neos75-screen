@@ -1,0 +1,28 @@
+# Vendor firmware and anything derived from it stay out of git.
+*.bin
+*.hex
+*.dfu
+firmware/analysis/
+firmware/build/
+firmware/toolchain/
+firmware/.tmp/
+backups/
+hwtest/20*/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Agent run logs
+**/run.log
+**/final.md
+
+# Renders that contain official UI artwork (design/official): regenerate locally (app: npm run shots)
+app/screenshots/
+design/neos_preview.png
+design/neos_status_*.png

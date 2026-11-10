@@ -1,0 +1,63 @@
+<!doctype html>
+<!-- Retro-futurism now playing. Cassette adapted from "CSS Cassette" by Tom Hazledine,
+     https://codepen.io/tomhazledine/pen/RwxeVw (CodePen, MIT); source in src/cassette.scss, compiled to
+     third_party/cassette.css. Kept: cassette markup and styles. Changed: sticker text is the track, the tape
+     packs follow playback progress, amber palette, amber terminal readout below (ours). -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Shadows+Into+Light&family=Long+Cang&family=Zen+Kurenaido&family=VT323&family=DotGothic16&display=block" rel="stylesheet">
+<link rel="stylesheet" href="third_party/cassette.css">
+<style>
+html, body { margin: 0; width: 480px; height: 360px; overflow: hidden; }
+body { position: relative; background: radial-gradient(ellipse at 50% 35%, #2a1a0c 0%, #140c06 60%, #0b0704 100%); }
+.stage { position: absolute; left: 0; right: 0; top: 18px; font-size: 15px; }
+.sticker .cursive { font-family: "Shadows Into Light", "Long Cang", "Zen Kurenaido", sans-serif !important; }
+/* Japanese titles (any kana): skip Long Cang so the kanji match the kana */
+.sticker .cursive.ja { font-family: "Shadows Into Light", "Zen Kurenaido", sans-serif !important; }
+.t { position: absolute; font-family: VT323, "DotGothic16", monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffb23e; text-shadow: 0 0 5px rgba(255,170,50,.6); }
+.d { color: #8a5a1a; text-shadow: none; }
+.bar { position: absolute; left: 40px; right: 40px; top: 300px; height: 8px; background: #2a1606; }
+.bar i { display: block; height: 100%; background: #ffb23e; box-shadow: 0 0 6px rgba(255,170,50,.6); }
+.scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px); pointer-events: none; }
+</style></head><body>
+<div class="stage">
+  <div class="cassetteOuter" id="tape">
+    <span class="screw screw1"><span class="screwInner"></span></span><span class="screw screw2"><span class="screwInner"></span></span>
+    <span class="screw screw3"><span class="screwInner"></span></span><span class="screw screw4"><span class="screwInner"></span></span>
+    <div class="stickerOuter"><div class="sticker">
+      <span class="a-side">A</span><p class="cursive" id="title"></p><span class="stripe"></span>
+      <span class="c90">D-C90</span><span class="logo">N75®</span>
+      <div class="middle clearfix">
+        <span class="circle one"><span class="teethBox"><span class="teeth"></span><span class="teeth"></span><span class="teeth"></span></span></span>
+        <div class="window"><span class="reelOne"></span><span class="reelTwo"></span></div>
+        <span class="circle two"><span class="teethBox"><span class="teeth"></span><span class="teeth"></span><span class="teeth"></span></span></span>
+      </div>
+    </div></div>
+    <div class="cassetteBottom"><span class="screw screw5"><span class="screwInner"></span></span>
+      <span class="bottomShadow"><span class="bottomHoles one"></span><span class="bottomHoles two"></span><span class="bottomHoles three"></span></span>
+      <span class="holes one"></span><span class="holes two"></span></div>
+  </div>
+</div>
+<div class="t" id="artist" style="left:40px;top:262px;font-size:26px;max-width:300px"></div>
+<div class="t d" id="state" style="right:40px;top:262px;font-size:26px">PLAY ▶</div>
+<div class="bar"><i id="prog"></i></div>
+<div class="t" id="pos" style="left:40px;top:314px;font-size:28px"></div>
+<div class="t d" id="rem" style="right:40px;top:314px;font-size:28px"></div>
+<div class="scan"></div>
+<script src="data.js"></script>
+<script src="cassette_deck.js"></script>
+<script>
+window.render = () => {
+  // the tape runs with the song, rewinds between songs and loops when there is no duration (cassette_deck.js)
+  const deck = tapeDeck(DATA), p = deck.p;
+  tape.style.setProperty("--p", p);
+  tape.style.setProperty("--spin", `${deck.spin}deg`);
+  title.textContent = DATA.has_media ? DATA.title : "No tape";
+  const ja = /[\u3040-\u30ff]/.test(title.textContent);
+  title.classList.toggle("ja", ja); title.lang = ja ? "ja" : "zh-CN";
+  artist.textContent = (DATA.artist || "").toUpperCase();
+  state.textContent = !DATA.has_media ? "STOP ■" : deck.rewinding ? "REW ◀◀" : DATA.playing ? "PLAY ▶" : "PAUSE ❚❚";
+  prog.style.width = `${p * 100}%`;
+  pos.textContent = mmss(DATA.pos); rem.textContent = DATA.dur ? "-" + mmss(DATA.dur - DATA.pos) : "--:--";
+};
+render();
+</script></body></html>

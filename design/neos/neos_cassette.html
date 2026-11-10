@@ -1,0 +1,87 @@
+<!doctype html>
+<!-- Néos cassette: the cassette is the screen (no page pill, no status bar). The cassette is "CSS Cassette" by
+     Tom Hazledine, https://codepen.io/tomhazledine/pen/RwxeVw (CodePen, MIT): its markup and its stylesheet
+     (../widgets/third_party/cassette.css, compiled from ../widgets/src/cassette.scss). Changed: the shell fills
+     480x360 (taller sticker and head opening, moulded-plastic shading, no drop shadow or side tabs), the hub
+     colour (teal, as in the original pen, instead of the amber of our retro theme), the sticker text (title and
+     artist handwritten, Chinese in Long Cang, Japanese in Yomogi; the original logo kept), transport and time
+     pad-printed on the shell, the tape packs following playback progress (rewinding between songs, looping when
+     there is no duration) and the hubs turning while music plays. -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="neos.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Shadows+Into+Light&family=Long+Cang&family=Yomogi&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../widgets/third_party/cassette.css">
+<style>
+/* the cassette is the screen: 20em x 15em at 24px (the pen's 20x12em shell, made taller) */
+body { background: #000; }
+.cassetteOuter { position: absolute; left: 0; top: 0; margin: 0; width: 480px; height: 360px; font-size: 24px;
+  border-radius: .45em;
+  /* moulded plastic: a little lighter at the top, darker towards the bottom, a faint sheen across */
+  background: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 22%, rgba(0,0,0,0) 70%, rgba(0,0,0,.10) 100%),
+    linear-gradient(105deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.07) 42%, rgba(255,255,255,0) 54%), #bbbbbb;
+  box-shadow: inset rgba(255,255,255,.35) 0 .08em 0 0, inset rgba(0,0,0,.25) 0 -.1em 0 0; }
+.cassetteOuter:before, .cassetteOuter:after { display: none; }
+.stickerOuter { height: 9.5em; }
+.sticker .a-side { top: .9em; }
+/* handwritten title and artist; Chinese in Long Cang, Japanese (any kana) all in Yomogi */
+.sticker .cursive { font-family: "Shadows Into Light", "Long Cang", MiSans, sans-serif !important;
+  font-size: 1.15em; padding: .45em 1em 0 2.9em; }
+.sticker .cursive.artist { font-size: .98em; padding: 0 1em 0 4.4em; color: #5a62b8; }
+.sticker .cursive.ja { font-family: "Shadows Into Light", Yomogi, MiSans, sans-serif !important; }
+.sticker .stripe { top: 3.6em; }
+.middle { margin-top: .55em; }
+.sticker .c90, .sticker .logo { bottom: .15em; }
+/* the hub colour: teal as in the original pen */
+.circle { background: #39b7c2;
+  box-shadow: inset #bbbbbb 0 0 0 .2em, inset rgb(148.75, 148.75, 148.75) 0 .1em 0 .2em, inset #efeeeb 0 .1em 0 .4em,
+    inset rgb(182.33, 177.79, 164.17) 0 .2em 0 .4em, inset #2a99a3 -.7em 1.5em 0 0; }
+.window { background: #2a99a3; }
+/* the head opening, a little larger; its lower face sits on the bottom edge */
+.cassetteBottom { font-size: 1.12em; bottom: .72em; }
+/* pad-printed on the shell either side of the head opening: transport and time */
+.print { position: absolute; top: 10.85em; width: 4.1em; text-align: center; color: #4d4d4d;
+  font-family: Lato, MiSans, sans-serif; text-shadow: rgba(255,255,255,.45) 0 .04em 0; white-space: nowrap; }
+.print.l { left: .35em; } .print.r { right: .35em; }
+.print .cap { display: block; font-size: .5em; font-weight: 900; letter-spacing: .14em; line-height: 1.5em; color: #5c5c5c; }
+.print .t { display: block; font-size: 1.05em; font-weight: 900; line-height: 1.2em; font-variant-numeric: tabular-nums; }
+</style></head><body data-status="off" data-pill="off" data-fps="12" data-quality="80">
+<div class="cassetteOuter" id="tape">
+  <span class="screw screw1"><span class="screwInner"></span></span><span class="screw screw2"><span class="screwInner"></span></span>
+  <span class="screw screw3"><span class="screwInner"></span></span><span class="screw screw4"><span class="screwInner"></span></span>
+  <div class="stickerOuter"><div class="sticker">
+    <span class="a-side">A</span><p class="cursive" id="title"></p><p class="cursive artist" id="artist"></p><span class="stripe"></span>
+    <span class="c90">D-C90</span><span class="logo">T.F.H.®</span>
+    <div class="middle clearfix">
+      <span class="circle one"><span class="teethBox"><span class="teeth"></span><span class="teeth"></span><span class="teeth"></span></span></span>
+      <div class="window"><span class="reelOne"></span><span class="reelTwo"></span></div>
+      <span class="circle two"><span class="teethBox"><span class="teeth"></span><span class="teeth"></span><span class="teeth"></span></span></span>
+    </div>
+  </div></div>
+  <div class="print l"><span class="cap" id="mode"></span><span class="t" id="pos"></span></div>
+  <div class="print r"><span class="cap">REMAIN</span><span class="t" id="rem"></span></div>
+  <div class="cassetteBottom"><span class="screw screw5"><span class="screwInner"></span></span>
+    <span class="bottomShadow"><span class="bottomHoles one"></span><span class="bottomHoles two"></span><span class="bottomHoles three"></span></span>
+    <span class="holes one"></span><span class="holes two"></span></div>
+</div>
+<script src="../widgets/data.js"></script>
+<script src="../widgets/cassette_deck.js"></script>
+<script>
+window.render = () => {
+  // the tape runs with the song (full at the start, empty at the end), rewinds visibly when it has to go back,
+  // and loops a virtual side when the player gives no duration (see cassette_deck.js)
+  const deck = tapeDeck(DATA);
+  tape.style.setProperty("--p", deck.p);
+  tape.style.setProperty("--spin", `${deck.spin}deg`);
+  title.textContent = DATA.has_media ? DATA.title : "No tape";
+  artist.textContent = DATA.has_media ? DATA.artist || "" : "";
+  for (const e of [title, artist]) {
+    const ja = /[\u3040-\u30ff]/.test(e.textContent);
+    e.classList.toggle("ja", ja); e.lang = ja ? "ja" : "zh-CN";
+  }
+  mode.textContent = !DATA.has_media ? "■ STOP" : deck.rewinding ? "◀◀ REW" : DATA.playing ? "▶ PLAY" : "❚❚ PAUSE";
+  pos.textContent = DATA.has_media ? mmss(DATA.pos) : "0:00";
+  rem.textContent = DATA.has_media && DATA.dur ? `-${mmss(Math.max(0, DATA.dur - DATA.pos))}` : "--:--";
+};
+render();
+</script>
+<script src="status.js"></script></body></html>
