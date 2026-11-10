@@ -613,6 +613,7 @@ function wire() {
     act(() => api("POST", `/api/runner/${active ? "stop" : "start"}`), active ? "已停止，设备已释放" : null).then(reloadStatus);
   };
   $("#btn-restart").onclick = () => act(() => api("POST", "/api/runner/restart")).then(reloadStatus);
+  $("#btn-agent-prompt").onclick = () => act(() => window.neos.copyAgentPrompt(), "已复制提示词，粘贴给智能体即可");
   for (const b of $$("[data-knob]")) b.onclick = () => act(() => api("POST", "/api/knob", { direction: Number(b.dataset.knob) }));
   $("#filters").onclick = e => {
     const b = e.target.closest("[data-filter]");

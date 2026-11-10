@@ -4,7 +4,7 @@
 // come from resources/design (NEOS75_ROOT).
 // Flags: --fake (service with the fake screen), --hidden (start in the tray; used for autostart),
 //        --shots=DIR (take GUI screenshots into DIR and quit).
-const { app, BrowserWindow, Tray, Menu, ipcMain, dialog, nativeImage, shell } = require("electron");
+const { app, BrowserWindow, Tray, Menu, ipcMain, dialog, nativeImage, shell, clipboard } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const http = require("http");
@@ -69,6 +69,30 @@ function pythonPath() {
   if (PACKAGED) return path.join(ROOT, "python", "python.exe");
   const venv = path.join(ROOT, "sdk", ".venv", "Scripts", "python.exe");
   return fs.existsSync(venv) ? venv : "python";
+}
+
+// The prompt behind "复制提示词": the skill (.claude/skills/neos75-screen, a copy in resources/skill when
+// installed) with this computer's paths, so any agent knows the screen after one paste.
+function agentPrompt() {
+  const repo = PACKAGED ? buildInfo().repo : ROOT;
+  const venvCtl = repo && path.join(repo, "sdk", ".venv", "Scripts", "neos75ctl.exe");
+  const fromRepo = !!venvCtl && fs.existsSync(venvCtl);
+  const base = fromRepo ? repo : ROOT;
+  const skillDir = fromRepo ? path.join(repo, ".claude", "skills", "neos75-screen") : path.join(ROOT, "skill");
+  const reference = path.join(skillDir, "reference.md");
+  const skill = fs.readFileSync(path.join(skillDir, "SKILL.md"), "utf8").replace(/\r\n/g, "\n")
+    .replace(/^---\n[\s\S]*?\n---\n+/, "")
+    .replace(/\]\(reference\.md\)/g, `](${reference})`);
+  const cli = fromRepo ? venvCtl : `"${path.join(ROOT, "python", "python.exe")}" -m neos75screen.service.cli`;
+  const env = [
+    `- 工作目录：${base}（下文的相对路径都相对于它，命令也在这里运行）`,
+    `- 命令行：${cli}（下文的 \`sdk/.venv/Scripts/neos75ctl\` 和 \`neos75ctl\` 都指它）`,
+    `- 页面数据字段和写页面的细节：${reference}`,
+  ];
+  if (!fromRepo) env.push(
+    `- 这是安装版：运行命令前设置环境变量 NEOS75_ROOT=${ROOT}；没有 \`check\`，新页面用 \`preview --offline\` 检查`);
+  return ["你可以操作这台电脑上 AULA Neos75 键盘的屏幕和两个旋钮。照下面的技能说明做，先运行 status 看当前状态。",
+          "", "本机环境：", ...env, "", "---", "", skill.trimEnd(), ""].join("\n");
 }
 
 function serviceEnv() {
@@ -232,6 +256,7 @@ ipcMain.handle("set-app-settings", (_e, changes) => {
 });
 ipcMain.handle("show-item", (_e, p) => shell.showItemInFolder(p));
 ipcMain.handle("open-path", (_e, p) => shell.openPath(p));
+ipcMain.handle("copy-agent-prompt", () => { const text = agentPrompt(); clipboard.writeText(text); return text; });
 ipcMain.handle("restart-service", async () => {
   await stopService();
   service = await ensureService();

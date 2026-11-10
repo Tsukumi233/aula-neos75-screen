@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld("neos", {
   setAppSettings: changes => ipcRenderer.invoke("set-app-settings", changes),
   showItem: p => ipcRenderer.invoke("show-item", p),
   openPath: p => ipcRenderer.invoke("open-path", p),
+  copyAgentPrompt: () => ipcRenderer.invoke("copy-agent-prompt"),
   restartService: () => ipcRenderer.invoke("restart-service"),
   onServiceExit: cb => ipcRenderer.on("service-exit", (_e, code) => cb(code)),
   onServiceRestarted: cb => ipcRenderer.on("service-restarted", (_e, info) => cb(info)),

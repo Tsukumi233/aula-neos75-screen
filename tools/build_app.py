@@ -8,6 +8,7 @@ Node.js:
   resources/design/        the pages: design/neos, design/widgets, design/custom, the official artwork
                            (design/official/jpg) and the MiSans fonts (design/vendor/misans/Normal)
   resources/sdk/tests/     fake_device.py (the demo mode's simulated screen)
+  resources/skill/         the agent skill (.claude/skills/neos75-screen), for the app's "复制提示词"
   resources/build-info.json  version, the repository it was built from (its design/custom is used when it
                            still exists), build time
 
@@ -119,6 +120,7 @@ def design() -> None:
     fake = RES / "sdk" / "tests"
     fake.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / "sdk" / "tests" / "fake_device.py", fake / "fake_device.py")
+    shutil.copytree(ROOT / ".claude" / "skills" / "neos75-screen", RES / "skill", dirs_exist_ok=True)
 
 
 def build_info(version: str) -> None:

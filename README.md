@@ -54,8 +54,10 @@ sdk\.venv\Scripts\neos75 pages neos_clock neos_hifi_player "neos_photo?src=D:/pi
 
 ## 给智能体
 
+- 桌面应用左栏「给智能体 → 复制提示词」：复制一段技能提示词（就是下面的技能，带上本机的命令行和路径），粘贴给
+  任何智能体（Codex、Cursor、Claude Code 网页版等）就能用
+- Claude Code 技能：[`.claude/skills/neos75-screen/`](.claude/skills/neos75-screen/SKILL.md)（列出/选择页面、写新页面、预览、上屏、旋钮动作；在本仓库里自动生效）
 - 屏幕服务的命令行（`--json` 输出）：`sdk\.venv\Scripts\neos75ctl status --json`
-- Claude Code 技能：[`.claude/skills/neos75-screen/`](.claude/skills/neos75-screen/SKILL.md)（列出/选择页面、写新页面、预览、上屏）
 - 本地 HTTP API：[`sdk/src/neos75screen/service/API.md`](sdk/src/neos75screen/service/API.md)
 - Python SDK：[`sdk/README.md`](sdk/README.md)
 

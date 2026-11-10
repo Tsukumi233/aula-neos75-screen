@@ -112,8 +112,8 @@ button.pill:disabled { opacity: .45; cursor: default; }
 .knob-sim { margin-top: 26px; }
 .knob-row { display: flex; align-items: center; gap: 8px; }
 .knob-flash { margin-left: 8px; color: var(--dim); font-size: 12px; transition: opacity .6s; }
-.agent-hint { margin-top: 30px; display: grid; gap: 6px; }
-.agent-hint code { padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: #0b0b0d; }
+.agent-hint { margin-top: 30px; display: grid; gap: 8px; justify-items: start; }
+.agent-hint p { margin: 0; font-size: 12.5px; line-height: 1.6; }
 
 /* --- knob cycle ----------------------------------------------------------------------------------- */
 .stock-strip { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; color: var(--dim); font-size: 12.5px; }

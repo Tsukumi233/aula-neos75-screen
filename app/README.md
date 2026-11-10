@@ -52,7 +52,7 @@ npm run fake       # 仅演示/开发：模拟设备，不需要键盘
 - **高级键**：4 个，即 Vial 的 tap dance：点按、按住、双击、点按后按住各发一个键，判定时间可调。官方驱动
   的“按住/单击（MT）”就是“点按 + 按住”；它的“切换开关（TGL）”这块键盘的固件不支持（读取返回错误）。
 - **灯光**：44 种灯效、亮度、速度、颜色、饱和度。
-- **性能**：Windows/macOS、按键响应间隔、防抖方式、深度睡眠时间、感应唤醒、电脑灯光同步（官方驱动的
+- **性能**：Windows/macOS、按键响应间隔、防抖方式、休眠时间、感应唤醒、电脑灯光同步（官方驱动的
   “性能设置”就是这六项）。
 
 **屏幕**
@@ -118,13 +118,15 @@ sdk\.venv\Scripts\python tools\build_app.py
 
 ## 给智能体
 
-同一个服务也给命令行和智能体用（界面和智能体可以同时操作，互相看到变化）：
+同一个服务也给命令行和智能体用（界面和智能体可以同时操作，互相看到变化）。左栏「给智能体 → 复制提示词」把
+技能 `.claude/skills/neos75-screen/SKILL.md` 连同本机路径（工作目录、`neos75ctl` 的位置、`reference.md`）复制到
+剪贴板，粘贴给智能体即可（`main.js` 的 `agentPrompt`）。开发版和构建仓库还在的安装版用仓库和 `sdk/.venv`；
+仓库不在时用安装包里的技能副本（`resources/skill`）和自带的 Python。
 
 ```bash
 sdk/.venv/Scripts/neos75ctl status --json
 ```
 
-Claude Code 技能：`.claude/skills/neos75-screen/`（列出/选择页面、写新页面、预览、上屏）。
 HTTP API：`sdk/src/neos75screen/service/API.md`。
 
 ## 截图
