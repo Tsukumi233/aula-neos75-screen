@@ -71,7 +71,8 @@ SYSTEM_ITEMS: dict[int, tuple[str, dict[int, str]]] = {
     5: ("系统", {0: "Windows", 1: "macOS"}),
     1: ("按键响应间隔", {v: f"{v} ms" for v in (*range(1, 21), 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 200)}),
     2: ("防抖方式", {0: "关", 1: "先发送后防抖", 2: "先防抖后发送"}),
-    7: ("深度睡眠时间", {v: f"{v} 分钟" for v in (*range(1, 21), 25, 30, 35, 40, 45, 50, 60)}),
+    # Aula Hub: "休眠设置", idle minutes before the keyboard sleeps, slider 1-60; the same row wired and over 2.4G
+    7: ("休眠时间", {v: f"{v} 分钟" for v in range(1, 61)}),
     9: ("感应唤醒", {0: "关", 1: "开"}),
     4: ("电脑灯光同步", {0: "开", 1: "关"}),
 }
