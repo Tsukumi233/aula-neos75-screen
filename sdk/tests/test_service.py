@@ -265,6 +265,51 @@ def test_runner_on_the_fake_screen(service) -> None:  # noqa: ANN001
 
 
 @browser
+def test_a_lost_screen_is_opened_again(service) -> None:  # noqa: ANN001
+    """Unplugging (the transport's reads fail) ends the session at once; the service then opens the screen again."""
+    svc, api = service
+    api.put("/api/pages", {"pages": ["neos_clock"]})
+    api.post("/api/runner/start")
+    wait_for(lambda: api.get("/api/status")["runner"]["frames"] > 0, timeout=60)
+    lost = svc.engine._screen
+    lost._t.disconnect()
+    status = wait_for(lambda: (s := api.get("/api/status"))["device"]["state"] == "absent" and s, timeout=5)
+    assert status["runner"]["state"] == "waiting"
+    wait_for(lambda: svc.engine._screen not in (None, lost) and api.get("/api/status")["runner"]["frames"] > 0,
+             timeout=60)
+    assert api.get("/api/status")["device"]["state"] == "connected"
+
+
+def test_a_screen_that_appears_again_is_opened_after_its_boot(home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """While the screen is missing it is looked for every RETRY_S; once it is enumerated again (it has just booted)
+    it is opened only APPEAR_WAIT_S later."""
+    from neos75screen import transport
+    from neos75screen.errors import DeviceNotFound
+    from neos75screen.service import engine as engine_module
+    monkeypatch.setattr(engine_module, "RETRY_S", 0.05)
+    monkeypatch.setattr(engine_module, "APPEAR_WAIT_S", 0.5)
+    present = iter([False, True])
+    monkeypatch.setattr(transport, "screen_present", lambda: next(present))
+    engine = Engine(Settings(run_on_start=False), fake=False, config=home / "pages.json", log_stdout=False)
+    opened: list[float] = []
+
+    def open_screen():  # noqa: ANN202
+        opened.append(time.monotonic())
+        if len(opened) < 3:
+            raise DeviceNotFound("no AULA Neos75 screen interface found")
+        raise engine_module._Stop
+
+    engine._open_screen = open_screen
+    try:
+        engine.start()
+        wait_for(lambda: len(opened) == 3, timeout=5)
+        assert opened[1] - opened[0] < 0.5           # still missing: looked for again soon
+        assert opened[2] - opened[1] >= 0.5          # enumerated again: opened after the boot wait
+    finally:
+        engine.close()
+
+
+@browser
 def test_preview_endpoint_renders_and_caches(home: Path) -> None:
     from neos75screen.service.preview import Previewer
     previewer = Previewer(home / "previews", log=lambda *_: None)

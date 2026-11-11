@@ -153,7 +153,7 @@ class Screen:
             self._press_hook.stop()
             self._press_hook = None
         try:
-            if leave and self._entered:
+            if leave and self._entered and self._t.lost is None:
                 self.leave()
         finally:
             self._closed = True
@@ -168,6 +168,12 @@ class Screen:
     def __exit__(self, exc_type: type[BaseException] | None, exc: BaseException | None,
                  tb: TracebackType | None) -> None:
         self.close()
+
+    @property
+    def lost(self) -> OSError | None:
+        """Why the screen went away (unplugged, the keyboard reconnected), or None. Every later command raises
+        DeviceLost: close this Screen and open the screen again."""
+        return self._t.lost
 
     # --- report plumbing ----------------------------------------------------------------------------
 
@@ -474,7 +480,7 @@ class Screen:
     def _keepalive_tick(self) -> None:
         """Send STATUS when nothing realtime was sent for host_timeout_ms / 3. Skipped while another thread
         holds the I/O lock (a request or a BA stream in progress, which is activity anyway)."""
-        if self._closed or not self._entered:
+        if self._closed or not self._entered or self._t.lost is not None:
             return
         if time.monotonic() - self._last_activity < self._keepalive_period():
             return

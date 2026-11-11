@@ -24,6 +24,8 @@ _HIDP_STATUS_SUCCESS = 0x00110000
 _HID_GUID = "{4d1e55b2-f16f-11cf-88cb-001111000030}"
 _REPORT_LEN = c.REPORT_SIZE + 1  # report ID + 64 bytes
 _WRITE_TIMEOUT_MS = 2000
+_ERROR_OPERATION_ABORTED = 995
+_ERROR_IO_PENDING = 997
 
 
 class _Overlapped(ctypes.Structure):
@@ -94,14 +96,24 @@ def _usage(path: str) -> tuple[int, int] | None:
 
 
 def _finish_io(handle: int, ov: _Overlapped, timeout_ms: int) -> int | None:
-    """Bytes transferred by an overlapped operation, or None (I/O cancelled after the timeout)."""
+    """Bytes transferred by an overlapped operation, or None (I/O cancelled after the timeout). Raises OSError
+    when the I/O failed (the device went away)."""
     if _k32.WaitForSingleObject(ov.hEvent, timeout_ms) != _WAIT_OBJECT_0:
         _k32.CancelIoEx(handle, ctypes.byref(ov))
     count = w.DWORD(0)
     # Wait for completion either way: the buffer and OVERLAPPED must stay valid until the I/O ends.
     if not _k32.GetOverlappedResult(handle, ctypes.byref(ov), ctypes.byref(count), True):
-        return None
+        error = ctypes.get_last_error()
+        if error == _ERROR_OPERATION_ABORTED:
+            return None
+        raise ctypes.WinError(error)
     return count.value
+
+
+def _start_io(ok: int) -> None:
+    """Raise if ReadFile/WriteFile failed at once instead of starting (the device went away)."""
+    if not ok and (error := ctypes.get_last_error()) != _ERROR_IO_PENDING:
+        raise ctypes.WinError(error)
 
 
 class WindowsTransport(Transport):
@@ -129,7 +141,7 @@ class WindowsTransport(Transport):
     def _read_raw(self, timeout_ms: int) -> bytes | None:
         ov = _Overlapped(hEvent=self._read_event)
         _k32.ResetEvent(self._read_event)
-        _k32.ReadFile(self._handle, self._read_buf, _REPORT_LEN, None, ctypes.byref(ov))
+        _start_io(_k32.ReadFile(self._handle, self._read_buf, _REPORT_LEN, None, ctypes.byref(ov)))
         count = _finish_io(self._handle, ov, timeout_ms)
         return self._read_buf.raw[1:count] if count else None
 
@@ -137,7 +149,7 @@ class WindowsTransport(Transport):
         ov = _Overlapped(hEvent=self._write_event)
         _k32.ResetEvent(self._write_event)
         data = bytes([c.REPORT_ID]) + report
-        _k32.WriteFile(self._handle, data, _REPORT_LEN, None, ctypes.byref(ov))
+        _start_io(_k32.WriteFile(self._handle, data, _REPORT_LEN, None, ctypes.byref(ov)))
         if _finish_io(self._handle, ov, _WRITE_TIMEOUT_MS) != _REPORT_LEN:
             raise OSError("HID write failed")
 

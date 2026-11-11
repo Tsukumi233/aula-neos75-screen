@@ -2,7 +2,9 @@
 and publishes events to the API's subscribers.
 
 The screen is opened only while the runner runs, so stopping the runner releases the HID device for other
-tools. A missing keyboard or a dropped connection is retried every few seconds while the runner should run.
+tools. A missing screen is looked for every few seconds while the runner should run. A screen that goes away
+(unplugged, the keyboard reconnected or left wired mode) ends the session at once; when it appears again it has
+usually just booted, so it is opened APPEAR_WAIT_S later, after the stock boot animation.
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ from . import API_VERSION, catalog
 from .paths import Settings, pages_file
 
 RETRY_S = 3.0
+APPEAR_WAIT_S = 5.0
 TICK_S = 1.0
 LOG_LINES = 300
 
@@ -159,6 +162,7 @@ class Engine:
         self._log_stdout = log_stdout
         self._lock = threading.RLock()
         self._want_run = False
+        self._interrupt = threading.Event()   # set by stop(): ends the waits between connection attempts
         self._thread: threading.Thread | None = None
         self._runner: ServiceRunner | None = None
         self._screen = None
@@ -259,6 +263,7 @@ class Engine:
     def start(self) -> None:
         with self._lock:
             self._want_run = True
+            self._interrupt.clear()
             if self._thread is not None and self._thread.is_alive():
                 return
             self._set_runner("starting")
@@ -268,6 +273,7 @@ class Engine:
     def stop(self, wait: float = 15.0) -> None:
         with self._lock:
             self._want_run = False
+            self._interrupt.set()
             runner, thread = self._runner, self._thread
         if runner is not None:
             self._set_runner("stopping")
@@ -329,12 +335,19 @@ class Engine:
         return info
 
     def _run_loop(self) -> None:
-        from ..errors import DeviceNotFound
+        from ..errors import DeviceLost, DeviceNotFound
+        from ..transport import screen_present
+        absent = False   # the last attempt found no screen
         while self._want_run:
             screen = None
             try:
                 self._set_device("connecting")
+                if absent and not self.fake and screen_present():
+                    self.log(f"screen found, connecting in {APPEAR_WAIT_S:.0f} s")
+                    if self._interrupt.wait(APPEAR_WAIT_S):
+                        break
                 screen = self._open_screen()
+                absent = False
                 self._screen = screen
                 self.device_info = self._describe_device(screen)
                 if not screen.realtime:
@@ -367,7 +380,13 @@ class Engine:
                 raise RuntimeError("runner ended")
             except _Stop:
                 break
+            except DeviceLost as exc:
+                absent = True
+                self.log(f"screen disconnected: {exc.cause}")
+                self._set_device("absent", str(exc))
+                self._set_runner("waiting", "键盘屏幕已断开")
             except DeviceNotFound as exc:
+                absent = True
                 self._set_device("absent", str(exc))
                 self._set_runner("waiting", "键盘屏幕未连接")
             except Exception as exc:  # noqa: BLE001 - reported, then retried
@@ -389,7 +408,7 @@ class Engine:
                     self._fake_device.stop()
                     self._fake_device = None
             if self._want_run:
-                time.sleep(RETRY_S)
+                self._interrupt.wait(RETRY_S)
         self.visible, self.host_page = None, None
         self._set_device("idle")
         self._set_runner("stopped")

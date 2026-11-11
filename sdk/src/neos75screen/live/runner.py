@@ -10,7 +10,8 @@ knob's cycle, turned to like a stock page (the first is "Page 7"); otherwise the
 press switches. With `config` (see `library`) the selection is re-read while running: pages can be added,
 removed or reordered at any time, and the runner re-registers the page count with the firmware; no flashing.
 While the knob has moved the screen to a stock page (slot hidden) nothing is sent; when the slot is shown
-again the current frame is sent.
+again the current frame is sent. When the screen goes away (unplugged, the keyboard reconnected) `run` raises
+DeviceLost within a render period; open the screen again for a new runner.
 
 Rendering and sending overlap: the main thread renders (headless Chrome) at each page's own rate and hands the
 newest frame to a sender thread, which brings the screen to it (changed tiles as region frames, a full frame
@@ -39,7 +40,7 @@ from pathlib import Path
 from PIL import Image, ImageChops
 
 from .. import constants as c
-from ..errors import FrameRejected, Neos75Error
+from ..errors import DeviceLost, FrameRejected, Neos75Error
 from ..imaging import encode_jpeg
 from . import cdp, library
 from .regions import dirty_regions
@@ -121,6 +122,9 @@ class _Sender(threading.Thread):
                 else:
                     r._upload_cache(*job)
                 self.failures = 0
+            except DeviceLost:
+                r._wake.set()   # the render loop sees `screen.lost` and ends the run
+                return
             except (Neos75Error, OSError) as exc:
                 # A rejected or timed-out frame: show the next one in full. Keep going; back off if it repeats.
                 self.failures += 1
@@ -291,6 +295,8 @@ class WidgetRunner:
                 while end is None or time.monotonic() < end:
                     started = time.monotonic()
                     self._wake.clear()
+                    if self.screen is not None and (lost := self.screen.lost) is not None:
+                        raise DeviceLost(lost)   # unplugged or the keyboard reconnected: the caller opens it again
                     changed = self._config_changed()
                     if changed is not None:
                         current = self.pages[self.index]
@@ -353,7 +359,7 @@ class WidgetRunner:
             media.stop()
             if spectrum is not None:
                 spectrum.stop()
-            if self.paged:
+            if self.paged and self.screen.lost is None:
                 try:
                     self.screen.set_pages(1)  # leave the slot as other apps expect it
                 except Exception as exc:  # noqa: BLE001

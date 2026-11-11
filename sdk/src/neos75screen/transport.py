@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from types import ModuleType, TracebackType
 
 from . import constants as c
-from .errors import DeviceNotFound
+from .errors import DeviceLost, DeviceNotFound
 from .guard import PacketGuard
 from .protocol import pad
 
@@ -26,6 +26,12 @@ class Transport(ABC):
         self._guard = PacketGuard()
         self._reports: queue.Queue[bytes] = queue.Queue()
         self._filter: Callable[[bytes], bool] | None = None
+        self._reader: ReaderThread | None = None   # device transports: the thread that reads input reports
+
+    @property
+    def lost(self) -> OSError | None:
+        """Why the device went away (its input reads failed: unplugged, keyboard reconnected), or None."""
+        return self._reader.error if self._reader is not None else None
 
     def set_report_filter(self, report_filter: Callable[[bytes], bool] | None) -> None:
         """Install a function that sees every input report first, on the receiving thread; reports for which
@@ -39,9 +45,12 @@ class Transport(ABC):
         self._reports.put(report)
 
     def write(self, payload: bytes) -> None:
-        """Pad to 64 bytes, check against the allow-list, then send. Raises ForbiddenPacket."""
+        """Pad to 64 bytes, check against the allow-list, then send. Raises ForbiddenPacket, and DeviceLost
+        once the device has gone away."""
         report = pad(payload)
         self._guard.check(report)
+        if (lost := self.lost) is not None:
+            raise DeviceLost(lost)
         self._write_report(report)
 
     def read(self, timeout: float) -> bytes | None:
@@ -89,7 +98,7 @@ class ReaderThread(threading.Thread):
         self._read_report = read_report
         self._deliver = deliver
         self._stop_event = threading.Event()
-        self.error: OSError | None = None
+        self.error: OSError | None = None   # set when a read fails: the device is gone
 
     def run(self) -> None:
         while not self._stop_event.is_set():
@@ -161,6 +170,22 @@ def open_transport() -> Transport:
     raise DeviceNotFound("the hidapi package is not installed")
 
 
+def screen_present() -> bool:
+    """Whether the screen interface is enumerated. Opens nothing for I/O and sends nothing."""
+    hid = _hidapi()
+    try:
+        if hid is not None:
+            HidapiTransport.find_path(hid)
+        elif sys.platform == "win32":
+            from ._win32 import WindowsTransport
+            WindowsTransport.find_path()
+        else:
+            return False
+    except DeviceNotFound:
+        return False
+    return True
+
+
 class MockTransport(Transport):
     """In-memory transport for tests.
 
@@ -172,6 +197,15 @@ class MockTransport(Transport):
         super().__init__()
         self.written: list[bytes] = []
         self._responder = responder
+        self._lost: OSError | None = None
+
+    @property
+    def lost(self) -> OSError | None:
+        return self._lost
+
+    def disconnect(self) -> None:
+        """Act as if the device went away: every later write raises DeviceLost."""
+        self._lost = OSError("device disconnected")
 
     def _write_report(self, report: bytes) -> None:
         self.written.append(report)

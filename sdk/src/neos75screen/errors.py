@@ -12,6 +12,15 @@ class DeviceNotFound(Neos75Error):
     """No screen interface (VID 5542, PID 0001, usage page FF60, usage 61) is present."""
 
 
+class DeviceLost(DeviceNotFound):
+    """The open screen went away (unplugged, the keyboard reconnected or left wired mode). A lost device stays
+    lost: close it and open the screen again."""
+
+    def __init__(self, cause: OSError) -> None:
+        self.cause = cause
+        super().__init__(f"the screen went away ({cause})")
+
+
 class StockFirmware(Neos75Error):
     """The screen runs stock firmware, so realtime commands are unavailable."""
 
